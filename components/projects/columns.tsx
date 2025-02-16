@@ -2,7 +2,7 @@
 
 // Import necessary components and types for table column definitions
 import { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -27,10 +27,23 @@ export const columns: ColumnDef<Project>[] = [
     accessorKey: "name",
     header: "Nombre",
   },
-  // Budget column - with currency formatting
+  // Budget column - with currency formatting and sorting
   {
     accessorKey: "budget",
-    header: () => <div className="text-right">Presupuesto</div>,
+    header: ({ column }) => {
+      return (
+        <div className="text-right">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex items-center pr-0 ml-auto"
+          >
+            Presupuesto
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      )
+    },
     cell: ({ row }) => {
       // Format budget as EUR currency
       const budget = parseFloat(row.getValue("budget"))

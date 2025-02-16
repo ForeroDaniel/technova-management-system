@@ -2,7 +2,7 @@
 
 // Import necessary components and types for table column definitions
 import { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -23,10 +23,21 @@ export type Employee = {
 
 // Define table columns configuration
 export const columns: ColumnDef<Employee>[] = [
-  // Name column - simple text display
+  // Name column - with sorting
   {
     accessorKey: "name",
-    header: "Nombre",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center pl-0"
+        >
+          Nombre
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   // Email column - simple text display
   {

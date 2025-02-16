@@ -20,7 +20,7 @@
 
 // Import necessary components and types for table column definitions
 import { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -48,10 +48,21 @@ export const columns: ColumnDef<Activity>[] = [
     accessorKey: "description",
     header: "Descripción",
   },
-  // Hours column - numeric display
+  // Hours column - numeric display with sorting
   {
     accessorKey: "hours",
-    header: "Horas",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center pl-0"
+        >
+          Horas
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => {
       const hours = parseFloat(row.getValue("hours"))
       return <div className="font-medium">{hours}</div>
@@ -67,10 +78,21 @@ export const columns: ColumnDef<Activity>[] = [
     accessorKey: "project_id",
     header: "ID Proyecto",
   },
-  // Date column - formatted date display
+  // Date column - formatted date display with sorting
   {
     accessorKey: "date",
-    header: "Fecha",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center pl-0"
+        >
+          Fecha
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => {
       const date = new Date(row.getValue("date"))
       return <div>{date.toLocaleDateString('es-ES')}</div>
