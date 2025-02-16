@@ -12,6 +12,7 @@
  * features like:
  * - Formatted date display
  * - Numeric formatting for hours
+ * - Display of related employee and project names (instead of IDs)
  * - Action dropdown menu for edit/delete operations
  * - Text-based filtering on description field
  */
@@ -32,12 +33,14 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 // Define the shape of our Activity data type
+// Now includes employee_name and project_name fields from related tables
+// instead of just the foreign key IDs
 export type Activity = {
   id: string
   description: string
   hours: number
-  employee_id: string
-  project_id: string
+  employee_name: string  // Name from the employees table
+  project_name: string   // Name from the projects table
   date: string
 }
 
@@ -68,15 +71,15 @@ export const columns: ColumnDef<Activity>[] = [
       return <div className="font-medium">{hours}</div>
     },
   },
-  // Employee ID column - simple text display
+  // Employee name column - displays the employee's name instead of ID
   {
-    accessorKey: "employee_id",
-    header: "ID Empleado",
+    accessorKey: "employee_name",
+    header: "Empleado",
   },
-  // Project ID column - simple text display
+  // Project name column - displays the project's name instead of ID
   {
-    accessorKey: "project_id",
-    header: "ID Proyecto",
+    accessorKey: "project_name",
+    header: "Proyecto",
   },
   // Date column - formatted date display with sorting
   {
