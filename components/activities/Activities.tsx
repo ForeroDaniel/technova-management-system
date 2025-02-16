@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { DataTable } from './data-table';
+import { DataTable } from '@/components/ui/data-table';
 import { columns } from './columns';
 import { Spinner } from '@/components/ui/spinner';
 
@@ -57,20 +57,12 @@ export default function Activities() {
             {activities.length === 0 ? (
                 <p>No hay actividades disponibles</p>
             ) : (
-                <>
-                    {/* Display activities in DataTable component */}
-                    <DataTable columns={columns} data={activities} />
-                    
-                    {/* Raw data display (commented out for reference)
-                    <div className="space-y-4">
-                        {activities.map((activity: any) => (
-                            <div key={activity.id} className="border p-4 rounded-lg">
-                                <pre>{JSON.stringify(activity, null, 2)}</pre>
-                            </div>
-                        ))}
-                    </div>
-                    */}
-                </>
+                <DataTable 
+                    columns={columns} 
+                    data={activities} 
+                    filterColumn="description"
+                    filterPlaceholder="Filtrar por descripción..."
+                />
             )}
         </div>
     );

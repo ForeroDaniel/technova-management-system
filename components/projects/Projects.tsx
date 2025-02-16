@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { DataTable } from './data-table';
+import { DataTable } from '@/components/ui/data-table';
 import { columns } from './columns';
 import { Spinner } from '@/components/ui/spinner';
 
@@ -56,20 +56,12 @@ export default function Projects() {
             {projects.length === 0 ? (
                 <p>No hay proyectos disponibles</p>
             ) : (
-                <>
-                    {/* Display projects in DataTable component */}
-                    <DataTable columns={columns} data={projects} />
-                    
-                    {/* Raw data display (commented out for reference)
-                    <div className="space-y-4">
-                        {projects.map((project: any) => (
-                            <div key={project.id} className="border p-4 rounded-lg">
-                                <pre>{JSON.stringify(project, null, 2)}</pre>
-                            </div>
-                        ))}
-                    </div>
-                    */}
-                </>
+                <DataTable 
+                    columns={columns} 
+                    data={projects}
+                    filterColumn="name"
+                    filterPlaceholder="Filtrar por nombre..."
+                />
             )}
         </div>
     );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { DataTable } from './data-table';
+import { DataTable } from '@/components/ui/data-table';
 import { columns } from './columns';
 import { Spinner } from '@/components/ui/spinner';
 
@@ -56,20 +56,12 @@ export default function Employees() {
             {employees.length === 0 ? (
                 <p>No hay empleados disponibles</p>
             ) : (
-                <>
-                    {/* Display employees in DataTable component */}
-                    <DataTable columns={columns} data={employees} />
-                    
-                    {/* Raw data display (commented out for reference)
-                    <div className="space-y-4">
-                        {employees.map((employee: any) => (
-                            <div key={employee.id} className="border p-4 rounded-lg">
-                                <pre>{JSON.stringify(employee, null, 2)}</pre>
-                            </div>
-                        ))}
-                    </div>
-                    */}
-                </>
+                <DataTable 
+                    columns={columns} 
+                    data={employees}
+                    filterColumn="name"
+                    filterPlaceholder="Filtrar por nombre..."
+                />
             )}
         </div>
     );
