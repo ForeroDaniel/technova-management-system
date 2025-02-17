@@ -13,7 +13,8 @@ import { Spinner } from '@/components/ui/spinner';
  * - Fetches project data from API
  * - Displays projects in a filterable and paginated table
  * - Provides loading and error states
- * - Supports project editing and deletion (UI only)
+ * - Supports project editing and deletion
+ * - Auto-refreshes data after updates
  */
 export default function Projects() {
     // State management for projects data, loading state, and errors
@@ -21,26 +22,29 @@ export default function Projects() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Fetch projects data when component mounts
-    useEffect(() => {
-        async function fetchProjects() {
-            try {
-                const response = await fetch('/api/projects');
-                const result = await response.json();
-                
-                // Handle API response
-                if (result.error) {
-                    setError(result.error);
-                } else {
-                    setProjects(result.data);
-                }
-            } catch (err) {
-                setError('Error fetching projects');
-            } finally {
-                setLoading(false);
+    // Function to fetch projects data
+    const fetchProjects = async () => {
+        try {
+            const response = await fetch('/api/projects');
+            const result = await response.json();
+            
+            // Handle API response
+            if (result.error) {
+                setError(result.error);
+            } else {
+                // Sort projects by ID by default
+                const sortedProjects = result.data.sort((a: any, b: any) => a.id - b.id);
+                setProjects(sortedProjects);
             }
+        } catch (err) {
+            setError('Error fetching projects');
+        } finally {
+            setLoading(false);
         }
+    };
 
+    // Initial data fetch
+    useEffect(() => {
         fetchProjects();
     }, []);
 
@@ -57,7 +61,7 @@ export default function Projects() {
                 <p>No hay proyectos disponibles</p>
             ) : (
                 <DataTable 
-                    columns={columns} 
+                    columns={columns(fetchProjects)} 
                     data={projects}
                     filterColumn="nombre"
                     filterPlaceholder="Filtrar por nombre..."

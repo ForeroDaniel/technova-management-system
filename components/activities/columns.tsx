@@ -28,9 +28,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useState } from "react"
+import { EditActivityDialog } from "./edit-activity-dialog"
 
 // Define the shape of our Activity data type
 export type Activity = {
@@ -47,7 +48,23 @@ export type Activity = {
 }
 
 // Define table columns configuration
-export const columns: ColumnDef<Activity>[] = [
+export const columns = (onUpdate: () => Promise<void>): ColumnDef<Activity>[] => [
+  // ID column for initial sorting
+  {
+    accessorKey: "id",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center pl-0"
+        >
+          ID
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
   // Description column
   {
     accessorKey: "descripcion",
@@ -127,6 +144,12 @@ export const columns: ColumnDef<Activity>[] = [
     header: () => <div className="text-right"></div>,
     cell: ({ row }) => {
       const activity = row.original
+      const [open, setOpen] = useState(false)
+      const [localActivity, setLocalActivity] = useState(activity)
+
+      const handleSave = (updatedActivity: Activity) => {
+        setLocalActivity(updatedActivity)
+      }
  
       return (
         <div className="text-right">
@@ -139,7 +162,7 @@ export const columns: ColumnDef<Activity>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setOpen(true)}>
                 Editar
               </DropdownMenuItem>
               <DropdownMenuItem>
@@ -147,6 +170,13 @@ export const columns: ColumnDef<Activity>[] = [
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <EditActivityDialog 
+            activity={localActivity}
+            open={open}
+            onOpenChange={setOpen}
+            onSave={handleSave}
+            onUpdate={onUpdate}
+          />
         </div>
       )
     },

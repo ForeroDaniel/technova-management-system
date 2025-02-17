@@ -9,22 +9,39 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useState } from "react"
+import { EditProjectDialog } from "./edit-project-dialog"
 
 // Define the shape of our Project data type
 export type Project = {
   id: number
   nombre: string
-  compañía: string
+  compania: string
   presupuesto: number
   fecha_inicio: string
   fecha_fin: string
 }
 
 // Define table columns configuration
-export const columns: ColumnDef<Project>[] = [
+export const columns = (onUpdate: () => Promise<void>): ColumnDef<Project>[] => [
+  // ID column for initial sorting
+  {
+    accessorKey: "id",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center pl-0"
+        >
+          ID
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
   // Name column - with sorting
   {
     accessorKey: "nombre",
@@ -99,6 +116,12 @@ export const columns: ColumnDef<Project>[] = [
     header: () => <div className="text-right"></div>,
     cell: ({ row }) => {
       const project = row.original
+      const [open, setOpen] = useState(false)
+      const [localProject, setLocalProject] = useState(project)
+
+      const handleSave = (updatedProject: Project) => {
+        setLocalProject(updatedProject)
+      }
  
       return (
         <div className="text-right">
@@ -111,7 +134,7 @@ export const columns: ColumnDef<Project>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setOpen(true)}>
                 Editar
               </DropdownMenuItem>
               <DropdownMenuItem>
@@ -119,6 +142,13 @@ export const columns: ColumnDef<Project>[] = [
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <EditProjectDialog 
+            project={localProject}
+            open={open}
+            onOpenChange={setOpen}
+            onSave={handleSave}
+            onUpdate={onUpdate}
+          />
         </div>
       )
     },

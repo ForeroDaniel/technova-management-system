@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     const { data, error } = await supabase
       .from('activity')
       .insert([{
-        descripción: body.descripción,
+        descripcion: body.descripcion,
         tipo: body.tipo,
         minutos: body.minutos,
         empleado_id: body.empleado_id,

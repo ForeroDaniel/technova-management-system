@@ -13,7 +13,8 @@ import { Spinner } from '@/components/ui/spinner';
  * - Fetches employee data from API
  * - Displays employees in a filterable and paginated table
  * - Provides loading and error states
- * - Supports employee editing and deletion (UI only)
+ * - Supports employee editing and deletion
+ * - Auto-refreshes data after updates
  */
 export default function Employees() {
     // State management for employees data, loading state, and errors
@@ -21,26 +22,29 @@ export default function Employees() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Fetch employees data when component mounts
-    useEffect(() => {
-        async function fetchEmployees() {
-            try {
-                const response = await fetch('/api/employees');
-                const result = await response.json();
-                
-                // Handle API response
-                if (result.error) {
-                    setError(result.error);
-                } else {
-                    setEmployees(result.data);
-                }
-            } catch (err) {
-                setError('Error fetching employees');
-            } finally {
-                setLoading(false);
+    // Function to fetch employees data
+    const fetchEmployees = async () => {
+        try {
+            const response = await fetch('/api/employees');
+            const result = await response.json();
+            
+            // Handle API response
+            if (result.error) {
+                setError(result.error);
+            } else {
+                // Sort employees by ID by default
+                const sortedEmployees = result.data.sort((a: any, b: any) => a.id - b.id);
+                setEmployees(sortedEmployees);
             }
+        } catch (err) {
+            setError('Error fetching employees');
+        } finally {
+            setLoading(false);
         }
+    };
 
+    // Initial data fetch
+    useEffect(() => {
         fetchEmployees();
     }, []);
 
@@ -57,7 +61,7 @@ export default function Employees() {
                 <p>No hay empleados disponibles</p>
             ) : (
                 <DataTable 
-                    columns={columns} 
+                    columns={columns(fetchEmployees)} 
                     data={employees}
                     filterColumn="nombre"
                     filterPlaceholder="Filtrar por nombre..."

@@ -13,8 +13,8 @@ import { Spinner } from '@/components/ui/spinner';
  * - Fetches activity data from API
  * - Displays activities in a filterable and paginated table
  * - Provides loading and error states
- * - Supports activity editing and deletion (UI only)
- * - Shows hours, employee IDs, project IDs, and dates
+ * - Supports activity editing and deletion
+ * - Auto-refreshes data after updates
  */
 export default function Activities() {
     // State management for activities data, loading state, and errors
@@ -22,26 +22,29 @@ export default function Activities() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Fetch activities data when component mounts
-    useEffect(() => {
-        async function fetchActivities() {
-            try {
-                const response = await fetch('/api/activities');
-                const result = await response.json();
-                
-                // Handle API response
-                if (result.error) {
-                    setError(result.error);
-                } else {
-                    setActivities(result.data);
-                }
-            } catch (err) {
-                setError('Error fetching activities');
-            } finally {
-                setLoading(false);
+    // Function to fetch activities data
+    const fetchActivities = async () => {
+        try {
+            const response = await fetch('/api/activities');
+            const result = await response.json();
+            
+            // Handle API response
+            if (result.error) {
+                setError(result.error);
+            } else {
+                // Sort activities by ID by default
+                const sortedActivities = result.data.sort((a: any, b: any) => a.id - b.id);
+                setActivities(sortedActivities);
             }
+        } catch (err) {
+            setError('Error fetching activities');
+        } finally {
+            setLoading(false);
         }
+    };
 
+    // Initial data fetch
+    useEffect(() => {
         fetchActivities();
     }, []);
 
@@ -58,8 +61,8 @@ export default function Activities() {
                 <p>No hay actividades disponibles</p>
             ) : (
                 <DataTable 
-                    columns={columns} 
-                    data={activities} 
+                    columns={columns(fetchActivities)} 
+                    data={activities}
                     filterColumn="descripcion"
                     filterPlaceholder="Filtrar por descripción..."
                 />

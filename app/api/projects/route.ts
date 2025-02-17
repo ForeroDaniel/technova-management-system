@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       .from('project')
       .insert([{
         nombre: body.nombre,
-        compañía: body.compañía,
+        compania: body.compania,
         presupuesto: body.presupuesto,
         fecha_inicio: body.fecha_inicio,
         fecha_fin: body.fecha_fin
