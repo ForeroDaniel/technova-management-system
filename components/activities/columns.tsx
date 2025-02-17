@@ -33,27 +33,34 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 // Define the shape of our Activity data type
-// Now includes employee_name and project_name fields from related tables
-// instead of just the foreign key IDs
 export type Activity = {
-  id: string
-  description: string
-  hours: number
-  employee_name: string  // Name from the employees table
-  project_name: string   // Name from the projects table
-  date: string
+  id: number
+  descripcion: string
+  tipo: string
+  minutos: number
+  empleado_id: number
+  proyecto_id: number
+  fecha: string
+  // Additional fields from joins
+  empleado_nombre?: string
+  proyecto_nombre?: string
 }
 
 // Define table columns configuration
 export const columns: ColumnDef<Activity>[] = [
-  // Description column - simple text display
+  // Description column
   {
-    accessorKey: "description",
+    accessorKey: "descripcion",
     header: "Descripción",
   },
-  // Hours column - numeric display with sorting
+  // Type column
   {
-    accessorKey: "hours",
+    accessorKey: "tipo",
+    header: "Tipo",
+  },
+  // Time column - with minutes formatting and sorting
+  {
+    accessorKey: "minutos",
     header: ({ column }) => {
       return (
         <Button
@@ -61,29 +68,41 @@ export const columns: ColumnDef<Activity>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="flex items-center pl-0"
         >
-          Horas
+          Tiempo
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
     },
     cell: ({ row }) => {
-      const hours = parseFloat(row.getValue("hours"))
-      return <div className="font-medium">{hours}</div>
+      const minutes = parseInt(row.getValue("minutos"))
+      const hours = Math.floor(minutes / 60)
+      const remainingMinutes = minutes % 60
+      return (
+        <div className="font-medium">
+          {hours > 0 ? `${hours}h ` : ''}{remainingMinutes}m
+        </div>
+      )
     },
   },
-  // Employee name column - displays the employee's name instead of ID
+  // Employee column - displays the employee's name if available
   {
-    accessorKey: "employee_name",
+    accessorKey: "empleado_nombre",
     header: "Empleado",
+    cell: ({ row }) => {
+      return row.getValue("empleado_nombre") || `ID: ${row.getValue("empleado_id")}`
+    },
   },
-  // Project name column - displays the project's name instead of ID
+  // Project column - displays the project's name if available
   {
-    accessorKey: "project_name",
+    accessorKey: "proyecto_nombre",
     header: "Proyecto",
+    cell: ({ row }) => {
+      return row.getValue("proyecto_nombre") || `ID: ${row.getValue("proyecto_id")}`
+    },
   },
-  // Date column - formatted date display with sorting
+  // Date column
   {
-    accessorKey: "date",
+    accessorKey: "fecha",
     header: ({ column }) => {
       return (
         <Button
@@ -97,11 +116,11 @@ export const columns: ColumnDef<Activity>[] = [
       )
     },
     cell: ({ row }) => {
-      const date = new Date(row.getValue("date"))
+      const date = new Date(row.getValue("fecha"))
       return <div>{date.toLocaleDateString('es-ES')}</div>
     },
   },
-  // Actions column - dropdown menu with edit/delete options
+  // Actions column
   {
     id: "actions",
     enableHiding: false,

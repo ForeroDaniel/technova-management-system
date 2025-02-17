@@ -15,17 +15,18 @@ import {
 
 // Define the shape of our Employee data type
 export type Employee = {
-  id: string
-  name: string
-  email: string
-  role: string
+  id: number
+  nombre: string
+  correo_electronico: string
+  equipo: string
+  costo_por_hora: number
 }
 
 // Define table columns configuration
 export const columns: ColumnDef<Employee>[] = [
   // Name column - with sorting
   {
-    accessorKey: "name",
+    accessorKey: "nombre",
     header: ({ column }) => {
       return (
         <Button
@@ -41,13 +42,27 @@ export const columns: ColumnDef<Employee>[] = [
   },
   // Email column - simple text display
   {
-    accessorKey: "email",
+    accessorKey: "correo_electronico",
     header: "Correo Electrónico",
   },
-  // Role column - simple text display
+  // Team column - simple text display
   {
-    accessorKey: "role",
-    header: "Rol",
+    accessorKey: "equipo",
+    header: "Equipo",
+  },
+  // Cost per hour column - with number formatting
+  {
+    accessorKey: "costo_por_hora",
+    header: "Costo por Hora",
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("costo_por_hora"));
+      const formatted = new Intl.NumberFormat("en", {
+        style: "currency",
+        currency: "USD",
+        currencyDisplay: "narrowSymbol",
+      }).format(amount);
+      return formatted;
+    },
   },
   // Actions column - dropdown menu with edit/delete options
   {

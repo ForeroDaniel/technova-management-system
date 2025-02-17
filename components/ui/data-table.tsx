@@ -51,7 +51,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  filterColumn = "name",              // Default to "name" if not specified
+  filterColumn = "nombre",              // Default to "nombre" if not specified
   filterPlaceholder = "Filtrar..."    // Default generic placeholder
 }: DataTableProps<TData, TValue>) {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])

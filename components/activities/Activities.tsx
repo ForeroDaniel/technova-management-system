@@ -60,7 +60,7 @@ export default function Activities() {
                 <DataTable 
                     columns={columns} 
                     data={activities} 
-                    filterColumn="description"
+                    filterColumn="descripcion"
                     filterPlaceholder="Filtrar por descripción..."
                 />
             )}

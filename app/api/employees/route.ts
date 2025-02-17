@@ -33,4 +33,40 @@ export async function GET() {
       { status: 500 }
     );
   }
+}
+
+/**
+ * POST /api/employees
+ * 
+ * Creates a new employee in the Supabase employee table.
+ * @returns {Promise<NextResponse>} JSON response containing:
+ * - On success: { data: Employee }
+ * - On error: { error: string } with appropriate status code
+ */
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    
+    const { data, error } = await supabase
+      .from('employee')
+      .insert([{
+        nombre: body.nombre,
+        correo_electronico: body.correo_electronico,
+        equipo: body.equipo,
+        costo_por_hora: body.costo_por_hora
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ data });
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Error creating employee' },
+      { status: 500 }
+    );
+  }
 } 

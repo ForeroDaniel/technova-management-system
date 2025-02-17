@@ -59,7 +59,7 @@ export default function Employees() {
                 <DataTable 
                     columns={columns} 
                     data={employees}
-                    filterColumn="name"
+                    filterColumn="nombre"
                     filterPlaceholder="Filtrar por nombre..."
                 />
             )}
