@@ -65,4 +65,64 @@ export async function PUT(
       { status: 500 }
     );
   }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const employeeParams = await params;
+    const { id } = employeeParams;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Se requiere el ID del empleado' },
+        { status: 400 }
+      );
+    }
+
+    // First, check if there are any activities associated with this employee
+    const { data: activities, error: fetchError } = await supabase
+      .from('activity')
+      .select('id')
+      .eq('empleado_id', id);
+
+    if (fetchError) {
+      return NextResponse.json({ error: fetchError.message }, { status: 500 });
+    }
+
+    // If there are associated activities, delete them first
+    if (activities && activities.length > 0) {
+      const { error: deleteActivitiesError } = await supabase
+        .from('activity')
+        .delete()
+        .eq('empleado_id', id);
+
+      if (deleteActivitiesError) {
+        return NextResponse.json({ 
+          error: `Error al eliminar las actividades asociadas: ${deleteActivitiesError.message}` 
+        }, { status: 500 });
+      }
+    }
+
+    // Now delete the employee
+    const { error: deleteEmployeeError } = await supabase
+      .from('employee')
+      .delete()
+      .eq('id', id);
+
+    if (deleteEmployeeError) {
+      return NextResponse.json({ 
+        error: `Error al eliminar el empleado: ${deleteEmployeeError.message}` 
+      }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Error al eliminar el empleado y sus actividades asociadas' },
+      { status: 500 }
+    );
+  }
 } 

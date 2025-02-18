@@ -62,4 +62,30 @@ export async function PUT(
       { status: 500 }
     );
   }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const activityParams = await params;
+    const { id } = activityParams;
+
+    const { error } = await supabase
+      .from('activity')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Error deleting activity' },
+      { status: 500 }
+    );
+  }
 } 

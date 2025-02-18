@@ -5,7 +5,6 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ActionCell } from "@/components/data-table/action-cell"
-import { EmployeeEditDialog } from "@/components/dialog-edit/employee-dialog"
 
 // Define the shape of our Employee data type
 export type Employee = {
@@ -82,7 +81,6 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Employee>[] =>
       <ActionCell
         entity={row.original}
         entityName="Employee"
-        EditDialog={EmployeeEditDialog}
         onUpdate={onUpdate}
       />
     ),

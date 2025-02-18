@@ -169,7 +169,7 @@ export function BaseDialog<T extends { id?: number }>(props: BaseDialogProps<T>)
           {isCreateMode ? props.title : `Editar ${props.entityName}`}
         </DialogTitle>
         <DialogDescription>
-          {isCreateMode ? props.description : `Realiza cambios en los datos del ${props.entityName.toLowerCase()} aquí.`}
+          {isCreateMode ? props.description : `Realiza cambios en los datos ${props.entityName.toLowerCase() === 'actividad' ? 'de la' : 'del'} ${props.entityName.toLowerCase()}.`}
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>

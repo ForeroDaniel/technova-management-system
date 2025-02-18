@@ -22,34 +22,48 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { DeleteDialog } from "@/components/dialog/delete-dialog"
+import { EditDialog } from "@/components/dialog/edit-dialog"
+import { Activity, Project, Employee } from "@/types"
 
-interface ActionCellProps<T> {
+const entityNamesInSpanish = {
+  'Project': 'Proyecto',
+  'Employee': 'Empleado',
+  'Activity': 'Actividad'
+} as const
+
+const entityEndpoints = {
+  'Project': '/api/projects',
+  'Employee': '/api/employees',
+  'Activity': '/api/activities'
+} as const
+
+type EntityMap = {
+  'Project': Project
+  'Employee': Employee
+  'Activity': Activity
+}
+
+interface ActionCellProps<T extends EntityMap[K], K extends keyof EntityMap> {
   entity: T
-  entityName: 'Project' | 'Employee' | 'Activity'
-  EditDialog: React.ComponentType<any>
+  entityName: K
   onUpdate: () => Promise<void>
 }
 
-export function ActionCell<T extends { id: number }>({ 
+export function ActionCell<T extends EntityMap[K], K extends keyof EntityMap>({ 
   entity,
   entityName,
-  EditDialog,
   onUpdate
-}: ActionCellProps<T>) {
-  const [open, setOpen] = useState(false)
+}: ActionCellProps<T, K>) {
+  const [editOpen, setEditOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const [localEntity, setLocalEntity] = useState(entity)
 
   const handleSave = (updatedEntity: T) => {
     setLocalEntity(updatedEntity)
   }
 
-  const dialogProps = {
-    open,
-    onOpenChange: setOpen,
-    onSave: handleSave,
-    onUpdate,
-    [entityName.toLowerCase()]: localEntity
-  }
+  const entityType = entityName.toLowerCase() as 'project' | 'employee' | 'activity'
 
   return (
     <div className="text-right">
@@ -62,15 +76,32 @@ export function ActionCell<T extends { id: number }>({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => setOpen(true)}>
+          <DropdownMenuItem onClick={() => setEditOpen(true)}>
             Editar
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem 
+            onClick={() => setDeleteOpen(true)}
+            className="text-destructive focus:text-destructive"
+          >
             Eliminar
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <EditDialog {...dialogProps} />
+      <EditDialog
+        entityType={entityType}
+        entity={localEntity}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        onUpdate={onUpdate}
+      />
+      <DeleteDialog
+        entity={localEntity}
+        entityName={entityNamesInSpanish[entityName]}
+        entityEndpoint={entityEndpoints[entityName]}
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        onUpdate={onUpdate}
+      />
     </div>
   )
 } 

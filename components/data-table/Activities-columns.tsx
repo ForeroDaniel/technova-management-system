@@ -24,7 +24,6 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ActionCell } from "@/components/data-table/action-cell"
-import { ActivityEditDialog } from "@/components/dialog-edit/activity-dialog"
 
 // Define the shape of our Activity data type
 export type Activity = {
@@ -125,7 +124,6 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Activity>[] =>
       <ActionCell
         entity={row.original}
         entityName="Activity"
-        EditDialog={ActivityEditDialog}
         onUpdate={onUpdate}
       />
     ),
