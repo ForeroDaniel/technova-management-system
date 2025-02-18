@@ -1,19 +1,20 @@
 /**
  * Generic Data Table Component
  * 
- * A reusable table component that provides advanced features including:
- * - Pagination
- * - Column filtering
- * - Sorting (when enabled in columns)
- * - Responsive design
- * - Type-safe data handling
+ * Features:
+ * - Pagination: Navigate through large datasets with Previous/Next controls
+ * - Column Filtering: Filter data based on user input
+ * - Sorting: Sort data when enabled in column definitions
+ * - Responsive Design: Adapts to different screen sizes
+ * - Type Safety: Fully typed with TypeScript for data integrity
  * 
- * The component is built on top of TanStack Table (React Table) and uses shadcn/ui
- * components for the UI elements. It's designed to be flexible and work with any
- * data structure that matches the provided column definitions.
+ * Technical Implementation:
+ * - Built on TanStack Table (React Table) for core functionality
+ * - Uses shadcn/ui components for consistent UI elements
+ * - Implements controlled components pattern for state management
  * 
- * @template TData The type of data being displayed in the table
- * @template TValue The type of values in the table cells
+ * @template TData - Type for the data items being displayed (e.g., User, Product)
+ * @template TValue - Type for the individual cell values
  */
 
 "use client"
@@ -41,11 +42,19 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
+/**
+ * Interface defining the required props for the DataTable component
+ * 
+ * @property columns - Array of column definitions that specify how to display and handle data
+ * @property data - Array of data items to be displayed in the table
+ * @property filterColumn - Optional name of the column to enable filtering (defaults to "nombre")
+ * @property filterPlaceholder - Optional placeholder text for the filter input
+ */
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]  // Column definitions
-  data: TData[]                        // Data to display
-  filterColumn?: string                // Column to filter on (optional)
-  filterPlaceholder?: string          // Placeholder text for filter input (optional)
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
+  filterColumn?: string
+  filterPlaceholder?: string
 }
 
 export function DataTable<TData, TValue>({
@@ -57,6 +66,14 @@ export function DataTable<TData, TValue>({
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [sorting, setSorting] = React.useState<SortingState>([])
 
+    /**
+     * Table initialization using useReactTable hook
+     * Configures core functionality:
+     * - Core row model for basic table structure
+     * - Pagination model for data segmentation
+     * - Sorting model for column sorting
+     * - Filtering model for data filtering
+     */
     const table = useReactTable({
         data,
         columns,

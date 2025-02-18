@@ -14,9 +14,9 @@
  * @returns {JSX.Element} The rendered navigation bar with tabbed content
  */
 
-import Activities from "./activities/Activities";
-import Employees from '@/components/employees/Employees';
-import Projects from '@/components/projects/Projects';
+import ActivitiesTable from "@/components/data-table/Activities-table";
+import EmployeesTable from '@/components/data-table/Employees-table';
+import ProjectsTable from '@/components/data-table/Projects-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 export default function Navbar() {
@@ -33,13 +33,13 @@ export default function Navbar() {
       </div>
       <div className="flex-1 p-4">
         <TabsContent value="activities" className="h-full">
-          <Activities/>
+          <ActivitiesTable/>
         </TabsContent>
         <TabsContent value="projects" className="h-full">
-          <Projects/>
+          <ProjectsTable/>
         </TabsContent>
         <TabsContent value="employees" className="h-full">
-          <Employees/>
+          <EmployeesTable/>
         </TabsContent>
       </div>
     </Tabs>

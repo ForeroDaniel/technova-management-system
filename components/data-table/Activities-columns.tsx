@@ -21,17 +21,10 @@
 
 // Import necessary components and types for table column definitions
 import { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal, ArrowUpDown } from "lucide-react"
+import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useState } from "react"
-import { EditActivityDialog } from "./edit-activity-dialog"
+import { ActionCell } from "@/components/data-table/action-cell"
+import { ActivityDialog } from "@/components/dialog-edit/activity-dialog"
 
 // Define the shape of our Activity data type
 export type Activity = {
@@ -142,43 +135,13 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Activity>[] =>
     id: "actions",
     enableHiding: false,
     header: () => <div className="text-right"></div>,
-    cell: ({ row }) => {
-      const activity = row.original
-      const [open, setOpen] = useState(false)
-      const [localActivity, setLocalActivity] = useState(activity)
-
-      const handleSave = (updatedActivity: Activity) => {
-        setLocalActivity(updatedActivity)
-      }
- 
-      return (
-        <div className="text-right">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Abrir menú</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => setOpen(true)}>
-                Editar
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                Eliminar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <EditActivityDialog 
-            activity={localActivity}
-            open={open}
-            onOpenChange={setOpen}
-            onSave={handleSave}
-            onUpdate={onUpdate}
-          />
-        </div>
-      )
-    },
+    cell: ({ row }) => (
+      <ActionCell
+        entity={row.original}
+        entityName="Activity"
+        EditDialog={ActivityDialog}
+        onUpdate={onUpdate}
+      />
+    ),
   },
 ] 
