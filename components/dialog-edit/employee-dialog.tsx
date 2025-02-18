@@ -1,7 +1,8 @@
 "use client"
 
-import { BaseDialog } from "@/components/dialog-edit/base-dialog"
-import { Employee } from "@/components/data-table/Employees-columns"
+import { BaseDialog } from "@/components/dialog/base-dialog"
+import { Employee } from "@/components/data-table/employees-columns"
+import { useEmployeeFields } from "@/components/dialog/useEmployeeFields"
 
 interface EmployeeDialogProps {
   employee: Employee
@@ -18,32 +19,11 @@ export function EmployeeDialog({
   onSave,
   onUpdate 
 }: EmployeeDialogProps) {
-  const fields = [
-    {
-      name: 'nombre',
-      label: 'Nombre',
-      type: 'text' as const,
-    },
-    {
-      name: 'correo_electronico',
-      label: 'Correo',
-      type: 'email' as const,
-    },
-    {
-      name: 'equipo',
-      label: 'Equipo',
-      type: 'text' as const,
-    },
-    {
-      name: 'costo_por_hora',
-      label: 'Costo/Hora',
-      type: 'number' as const,
-      setValue: (value: string) => parseFloat(value),
-    },
-  ]
+  const fields = useEmployeeFields()
 
   return (
     <BaseDialog
+      mode="edit"
       entity={employee}
       entityName="Empleado"
       entityEndpoint="/api/employees"

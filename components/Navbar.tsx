@@ -14,9 +14,9 @@
  * @returns {JSX.Element} The rendered navigation bar with tabbed content
  */
 
-import ActivitiesTable from "@/components/data-table/Activities-table";
-import EmployeesTable from '@/components/data-table/Employees-table';
-import ProjectsTable from '@/components/data-table/Projects-table';
+import ActivitiesTable from "@/components/data-table/activities-table";
+import EmployeesTable from '@/components/data-table/employees-table';
+import ProjectsTable from '@/components/data-table/projects-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 export default function Navbar() {

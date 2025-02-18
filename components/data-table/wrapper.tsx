@@ -12,7 +12,7 @@
  * operations and state while delegating the presentation to the DataTable component.
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, ReactNode } from 'react';
 import { DataTable } from '@/components/data-table/table';
 import { Spinner } from '@/components/ui/spinner';
 import { ColumnDef } from '@tanstack/react-table';
@@ -26,6 +26,9 @@ import { ColumnDef } from '@tanstack/react-table';
  * @property filterColumn - Column identifier used for filtering data
  * @property filterPlaceholder - Placeholder text for the filter input
  * @property emptyMessage - Message to display when no data is available
+ * @property createButtonText - Text for the create button (legacy support)
+ * @property createButton - Custom create button component
+ * @property initialSorting - Initial sorting configuration
  */
 interface DataTableWrapperProps<TData> {
     title: string;
@@ -34,6 +37,9 @@ interface DataTableWrapperProps<TData> {
     filterColumn: string;
     filterPlaceholder: string;
     emptyMessage: string;
+    createButtonText?: string;
+    createButton?: ReactNode;
+    initialSorting?: { id: string; desc: boolean }[];
 }
 
 /**
@@ -52,7 +58,10 @@ export function DataTableWrapper<TData extends { id: number }>({
     columns,
     filterColumn,
     filterPlaceholder,
-    emptyMessage
+    emptyMessage,
+    createButtonText,
+    createButton,
+    initialSorting = []
 }: DataTableWrapperProps<TData>) {
     const [data, setData] = useState<TData[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -112,6 +121,9 @@ export function DataTableWrapper<TData extends { id: number }>({
                     data={data}
                     filterColumn={filterColumn}
                     filterPlaceholder={filterPlaceholder}
+                    createButtonText={createButtonText}
+                    createButton={createButton}
+                    initialSorting={initialSorting}
                 />
             )}
         </div>

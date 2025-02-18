@@ -49,22 +49,31 @@ import { Input } from "@/components/ui/input"
  * @property data - Array of data items to be displayed in the table
  * @property filterColumn - Optional name of the column to enable filtering (defaults to "nombre")
  * @property filterPlaceholder - Optional placeholder text for the filter input
+ * @property createButtonText - Optional text for the create button (legacy support)
+ * @property createButton - Optional custom create button component
+ * @property initialSorting - Optional initial sorting state
  */
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   filterColumn?: string
   filterPlaceholder?: string
+  createButtonText?: string
+  createButton?: React.ReactNode
+  initialSorting?: { id: string; desc: boolean }[]
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   filterColumn = "nombre",              // Default to "nombre" if not specified
-  filterPlaceholder = "Filtrar..."    // Default generic placeholder
+  filterPlaceholder = "Filtrar...",    // Default generic placeholder
+  createButtonText,
+  createButton,
+  initialSorting = []
 }: DataTableProps<TData, TValue>) {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-    const [sorting, setSorting] = React.useState<SortingState>([])
+    const [sorting, setSorting] = React.useState<SortingState>(initialSorting)
 
     /**
      * Table initialization using useReactTable hook
@@ -89,83 +98,90 @@ export function DataTable<TData, TValue>({
         },
     })
 
-  return (
-    <div>
-      {/* Search/filter input field */}
-      <div className="flex items-center py-4">
-        <Input
-          placeholder={filterPlaceholder}
-          value={(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn(filterColumn)?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-      </div>
+    const renderCreateButton = () => {
+        if (createButton) return createButton;
+        if (createButtonText) return <Button variant="default">{createButtonText}</Button>;
+        return null;
+    };
 
-      {/* Main table structure */}
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
+    return (
+        <div>
+            {/* Search/filter input field */}
+            <div className="flex items-center py-4 gap-2">
+                <Input
+                    placeholder={filterPlaceholder}
+                    value={(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""}
+                    onChange={(event) =>
+                        table.getColumn(filterColumn)?.setFilterValue(event.target.value)
+                    }
+                    className="w-full"
+                />
+                {renderCreateButton()}
+            </div>
+
+            {/* Main table structure */}
+            <div className="rounded-md border">
+                <Table>
+                    <TableHeader>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(
+                                                header.column.columnDef.header,
+                                                header.getContext()
+                                            )}
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows?.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    data-state={row.getIsSelected() && "selected"}
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                    No hay resultados.
+                                </TableCell>
+                            </TableRow>
                         )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No hay resultados.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                    </TableBody>
+                </Table>
+            </div>
 
-      {/* Pagination controls */}
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Anterior
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Siguiente
-        </Button>
-      </div>
-    </div>
-  )
+            {/* Pagination controls */}
+            <div className="flex items-center justify-end space-x-2 py-4">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                >
+                    Anterior
+                </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                >
+                    Siguiente
+                </Button>
+            </div>
+        </div>
+    )
 } 

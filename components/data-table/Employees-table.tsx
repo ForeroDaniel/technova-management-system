@@ -1,7 +1,9 @@
 'use client';
 
 import { DataTableWrapper } from '@/components/data-table/wrapper';
-import { columns } from '@/components/data-table/Employees-columns';
+import { columns } from '@/components/data-table/employees-columns';
+import { EmployeeCreateDialog } from '@/components/dialog-create/employee-dialog';
+import { useState } from 'react';
 
 /**
  * Employees Component
@@ -15,6 +17,13 @@ import { columns } from '@/components/data-table/Employees-columns';
  * - Auto-refreshes data after updates
  */
 export default function EmployeesTable() {
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+    const handleUpdate = async () => {
+        setRefreshTrigger(prev => prev + 1);
+        return Promise.resolve();
+    };
+
     return (
         <DataTableWrapper 
             title="Empleados"
@@ -23,6 +32,9 @@ export default function EmployeesTable() {
             filterColumn="nombre"
             filterPlaceholder="Filtrar por nombre..."
             emptyMessage="No hay empleados disponibles"
+            createButton={<EmployeeCreateDialog onUpdate={handleUpdate} />}
+            key={refreshTrigger}
+            initialSorting={[{ id: "nombre", desc: false }]}
         />
     );
 } 

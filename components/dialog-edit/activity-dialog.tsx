@@ -1,7 +1,8 @@
 "use client"
 
-import { BaseDialog } from "@/components/dialog-edit/base-dialog"
-import { Activity } from "@/components/data-table/Activities-columns"
+import { Activity } from "@/components/data-table/activities-columns"
+import { BaseDialog } from "@/components/dialog/base-dialog"
+import { useActivityFields } from "@/components/dialog/useActivityFields"
 
 interface ActivityDialogProps {
   activity: Activity
@@ -18,45 +19,11 @@ export function ActivityDialog({
   onSave,
   onUpdate 
 }: ActivityDialogProps) {
-  const fields = [
-    {
-      name: 'descripcion',
-      label: 'Descripción',
-      type: 'text' as const,
-    },
-    {
-      name: 'tipo',
-      label: 'Tipo',
-      type: 'text' as const,
-    },
-    {
-      name: 'minutos',
-      label: 'Minutos',
-      type: 'number' as const,
-      setValue: (value: string) => parseInt(value),
-    },
-    {
-      name: 'empleado_id',
-      label: 'Empleado ID',
-      type: 'number' as const,
-      setValue: (value: string) => parseInt(value),
-    },
-    {
-      name: 'proyecto_id',
-      label: 'Proyecto ID',
-      type: 'number' as const,
-      setValue: (value: string) => parseInt(value),
-    },
-    {
-      name: 'fecha',
-      label: 'Fecha',
-      type: 'date' as const,
-      getValue: (value: string) => value.split('T')[0],
-    },
-  ]
+  const fields = useActivityFields(activity)
 
   return (
     <BaseDialog
+      mode="edit"
       entity={activity}
       entityName="Actividad"
       entityEndpoint="/api/activities"

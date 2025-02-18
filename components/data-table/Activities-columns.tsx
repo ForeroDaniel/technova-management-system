@@ -42,9 +42,9 @@ export type Activity = {
 
 // Define table columns configuration
 export const columns = (onUpdate: () => Promise<void>): ColumnDef<Activity>[] => [
-  // ID column for initial sorting
+  // Date column
   {
-    accessorKey: "id",
+    accessorKey: "fecha",
     header: ({ column }) => {
       return (
         <Button
@@ -52,11 +52,17 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Activity>[] =>
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="flex items-center pl-0"
         >
-          ID
+          Fecha
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
     },
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("fecha"))
+      return <div>{date.toLocaleDateString('es-ES')}</div>
+    },
+    sortingFn: "datetime",
+    sortDescFirst: true,
   },
   // Description column
   {
@@ -108,26 +114,6 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Activity>[] =>
     header: "Proyecto",
     cell: ({ row }) => {
       return row.getValue("proyecto_nombre") || `ID: ${row.getValue("proyecto_id")}`
-    },
-  },
-  // Date column
-  {
-    accessorKey: "fecha",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center pl-0"
-        >
-          Fecha
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("fecha"))
-      return <div>{date.toLocaleDateString('es-ES')}</div>
     },
   },
   // Actions column

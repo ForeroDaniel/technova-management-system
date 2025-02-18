@@ -19,22 +19,6 @@ export type Project = {
 
 // Define table columns configuration
 export const columns = (onUpdate: () => Promise<void>): ColumnDef<Project>[] => [
-  // ID column for initial sorting
-  {
-    accessorKey: "id",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center pl-0"
-        >
-          ID
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-  },
   // Name column - with sorting
   {
     accessorKey: "nombre",
@@ -66,7 +50,7 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Project>[] => 
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="flex items-center pr-0 ml-auto"
-          >
+            >
             Presupuesto
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
@@ -80,18 +64,31 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Project>[] => 
         currency: "USD",
         currencyDisplay: "narrowSymbol",
       }).format(amount)
- 
+      
       return <div className="text-right font-medium">{formatted}</div>
     },
   },
   // Start date column
   {
     accessorKey: "fecha_inicio",
-    header: "Fecha Inicio",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center pl-0"
+        >
+          Fecha Inicio
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => {
       const date = new Date(row.getValue("fecha_inicio"))
       return <div>{date.toLocaleDateString('es-ES')}</div>
     },
+    sortingFn: "datetime",
+    sortDescFirst: true,
   },
   // End date column
   {

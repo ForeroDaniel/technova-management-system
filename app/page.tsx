@@ -8,7 +8,7 @@
  * @returns {JSX.Element} The rendered home page with navigation
  */
 
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/navbar";
 
 export default function Home() {
   return (

@@ -18,22 +18,6 @@ export type Employee = {
 
 // Define table columns configuration
 export const columns = (onUpdate: () => Promise<void>): ColumnDef<Employee>[] => [
-  // ID column for initial sorting
-  {
-    accessorKey: "id",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center pl-0"
-        >
-          ID
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-  },
   // Name column - with sorting
   {
     accessorKey: "nombre",
@@ -49,6 +33,8 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Employee>[] =>
         </Button>
       )
     },
+    sortingFn: "text",
+    sortDescFirst: false,
   },
   // Email column - simple text display
   {

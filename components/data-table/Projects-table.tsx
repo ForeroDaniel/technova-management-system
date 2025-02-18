@@ -1,7 +1,9 @@
 'use client';
 
 import { DataTableWrapper } from '@/components/data-table/wrapper';
-import { columns } from '@/components/data-table/Projects-columns';
+import { columns } from '@/components/data-table/projects-columns';
+import { ProjectCreateDialog } from '@/components/dialog-create/project-dialog';
+import { useState } from 'react';
 
 /**
  * Projects Component
@@ -15,6 +17,13 @@ import { columns } from '@/components/data-table/Projects-columns';
  * - Auto-refreshes data after updates
  */
 export default function ProjectsTable() {
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+    const handleUpdate = async () => {
+        setRefreshTrigger(prev => prev + 1);
+        return Promise.resolve();
+    };
+
     return (
         <DataTableWrapper 
             title="Proyectos"
@@ -23,6 +32,9 @@ export default function ProjectsTable() {
             filterColumn="nombre"
             filterPlaceholder="Filtrar por nombre..."
             emptyMessage="No hay proyectos disponibles"
+            createButton={<ProjectCreateDialog onUpdate={handleUpdate} />}
+            key={refreshTrigger}
+            initialSorting={[{ id: "fecha_inicio", desc: true }]}
         />
     );
 } 
