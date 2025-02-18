@@ -1,33 +1,9 @@
-import { useEffect } from "react"
 import * as z from "zod"
-import { useSharedData } from "../hooks/useSharedData"
-
-interface Employee {
-  id: number
-  nombre: string
-}
-
-interface Project {
-  id: number
-  nombre: string
-}
-
-interface Activity {
-  empleado_id: number
-  proyecto_id: number
-  empleado_nombre?: string
-  proyecto_nombre?: string
-}
+import { useAppDataSWR } from "@/hooks/useApiData"
+import { Activity } from "@/types"
 
 export function useActivityFields(currentActivity?: Activity) {
-  const { employees, projects, fetchData, hasInitialized } = useSharedData()
-
-  useEffect(() => {
-    // Only fetch if we haven't initialized yet
-    if (!hasInitialized) {
-      fetchData()
-    }
-  }, [hasInitialized, fetchData])
+  const { employees, projects } = useAppDataSWR()
 
   const fields = [
     {

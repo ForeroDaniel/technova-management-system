@@ -25,7 +25,7 @@ export function useEmployeeFields() {
       label: 'Costo por Hora',
       type: 'number' as const,
       validation: z.string().refine(
-        (val: string) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
+        (val: string) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0,
         "El costo por hora debe ser un número positivo"
       ),
       transform: (value: string) => parseFloat(value),

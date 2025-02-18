@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { mutate } from 'swr'
 
 export interface SelectOption {
   value: string
@@ -125,14 +126,17 @@ export function BaseDialog<T extends { id?: number }>(props: BaseDialogProps<T>)
         props.entityEndpoint : 
         `${props.entityEndpoint}/${(props as EditDialogProps<T>).entity.id}`;
 
+      const method = isCreateMode ? 'POST' : 'PUT';
+      const body = isCreateMode ? transformedData : {
+        ...transformedData,
+        id: (props as EditDialogProps<T>).entity.id
+      };
+
       const response = await fetch(url, {
-        method: isCreateMode ? 'POST' : 'PUT',
+        method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(isCreateMode ? transformedData : {
-          ...transformedData,
-          id: (props as EditDialogProps<T>).entity.id
-        }),
-      })
+        body: JSON.stringify(body),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -146,10 +150,12 @@ export function BaseDialog<T extends { id?: number }>(props: BaseDialogProps<T>)
         (props as EditDialogProps<T>).onSave(responseData);
       }
       
+      // Revalidate the data using SWR
+      await mutate(props.entityEndpoint);
       await props.onUpdate();
       
       if (isCreateMode) {
-        form.reset(); // Only reset form for create mode
+        form.reset();
       }
     } catch (error) {
       console.error(`Error ${isCreateMode ? 'creating' : 'updating'} ${props.entityName.toLowerCase()}:`, error);

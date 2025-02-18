@@ -8,8 +8,14 @@
 
 import { BaseDialog } from "@/components/dialog/base-dialog"
 import { useEmployeeFields } from "@/components/dialog/useEmployeeFields"
+import { useAppDataSWR } from "@/hooks/useApiData"
 
-export function EmployeeCreateDialog({ onUpdate }: { onUpdate: () => Promise<void> }) {
+interface EmployeeCreateDialogProps {
+  onUpdate: () => Promise<void>
+}
+
+export function EmployeeCreateDialog({ onUpdate }: EmployeeCreateDialogProps) {
+  const { refreshData } = useAppDataSWR()
   const fields = useEmployeeFields()
 
   return (

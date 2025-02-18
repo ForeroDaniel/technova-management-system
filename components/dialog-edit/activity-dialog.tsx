@@ -1,37 +1,35 @@
 "use client"
 
-import { Activity } from "@/components/data-table/activities-columns"
 import { BaseDialog } from "@/components/dialog/base-dialog"
 import { useActivityFields } from "@/components/dialog/useActivityFields"
+import { useAppDataSWR } from "@/hooks/useApiData"
+import { Activity } from "@/types"
 
-interface ActivityDialogProps {
+interface ActivityEditDialogProps {
   activity: Activity
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSave: (activity: Activity) => void
   onUpdate: () => Promise<void>
 }
 
-export function ActivityDialog({ 
-  activity, 
-  open, 
-  onOpenChange, 
-  onSave,
-  onUpdate 
-}: ActivityDialogProps) {
-  const fields = useActivityFields(activity)
+export function ActivityEditDialog({ activity, open, onOpenChange, onUpdate }: ActivityEditDialogProps) {
+  const { refreshData } = useAppDataSWR()
+  const activityFields = useActivityFields()
 
   return (
     <BaseDialog
       mode="edit"
-      entity={activity}
       entityName="Actividad"
       entityEndpoint="/api/activities"
-      fields={fields}
+      fields={activityFields}
+      entity={activity}
       open={open}
       onOpenChange={onOpenChange}
-      onSave={onSave}
-      onUpdate={onUpdate}
+      onUpdate={async () => {
+        await refreshData()
+        await onUpdate()
+      }}
+      onSave={() => {}}
     />
   )
 } 

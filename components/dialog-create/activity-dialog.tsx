@@ -8,21 +8,30 @@
 
 import { BaseDialog } from "@/components/dialog/base-dialog"
 import { useActivityFields } from "@/components/dialog/useActivityFields"
+import { useAppDataSWR } from "@/hooks/useApiData"
 
-export function ActivityCreateDialog({ onUpdate }: { onUpdate: () => Promise<void> }) {
-  const fields = useActivityFields()
+interface ActivityCreateDialogProps {
+  onUpdate: () => Promise<void>
+}
+
+export function ActivityCreateDialog({ onUpdate }: ActivityCreateDialogProps) {
+  const { refreshData } = useAppDataSWR()
+  const activityFields = useActivityFields()
 
   return (
     <BaseDialog
       mode="create"
-      triggerText="Crear Actividad"
       entityName="Actividad"
       entityEndpoint="/api/activities"
-      fields={fields}
+      fields={activityFields}
+      onUpdate={async () => {
+        await refreshData()
+        await onUpdate()
+      }}
+      triggerText="Nueva Actividad"
       title="Crear Actividad"
-      description="Agrega una nueva actividad al sistema."
+      description="Añade una nueva actividad al sistema."
       submitText="Crear"
-      onUpdate={onUpdate}
     />
   )
 } 

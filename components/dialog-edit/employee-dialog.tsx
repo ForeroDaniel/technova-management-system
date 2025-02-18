@@ -1,37 +1,35 @@
 "use client"
 
 import { BaseDialog } from "@/components/dialog/base-dialog"
-import { Employee } from "@/components/data-table/employees-columns"
 import { useEmployeeFields } from "@/components/dialog/useEmployeeFields"
+import { useAppDataSWR } from "@/hooks/useApiData"
+import { Employee } from "@/types"
 
-interface EmployeeDialogProps {
+interface EmployeeEditDialogProps {
   employee: Employee
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSave: (employee: Employee) => void
   onUpdate: () => Promise<void>
 }
 
-export function EmployeeDialog({ 
-  employee, 
-  open, 
-  onOpenChange, 
-  onSave,
-  onUpdate 
-}: EmployeeDialogProps) {
-  const fields = useEmployeeFields()
+export function EmployeeEditDialog({ employee, open, onOpenChange, onUpdate }: EmployeeEditDialogProps) {
+  const { refreshData } = useAppDataSWR()
+  const employeeFields = useEmployeeFields()
 
   return (
     <BaseDialog
       mode="edit"
-      entity={employee}
       entityName="Empleado"
       entityEndpoint="/api/employees"
-      fields={fields}
+      fields={employeeFields}
+      entity={employee}
       open={open}
       onOpenChange={onOpenChange}
-      onSave={onSave}
-      onUpdate={onUpdate}
+      onUpdate={async () => {
+        await refreshData()
+        await onUpdate()
+      }}
+      onSave={() => {}}
     />
   )
 } 
