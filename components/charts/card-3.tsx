@@ -1,7 +1,20 @@
+/**
+ * Card3 Component - Hours Per Project Chart
+ * 
+ * Displays a donut chart showing the distribution of hours across projects:
+ * - Each segment represents a different project
+ * - The size of each segment shows the relative time investment
+ * - The center shows the total hours across all projects
+ * - Tooltips show detailed hours and percentages
+ * 
+ * Uses different colors for each project segment for easy differentiation.
+ */
+
 'use client'
 
 import { Card, CardHeader, CardDescription, CardContent, CardTitle } from "@/components/ui/card"; 
 import { useAppDataSWR } from "@/hooks/useApiData";
+import { getProjectHoursData } from "@/utils/chart-data";
 import {
     PieChart,
     Pie,
@@ -12,19 +25,11 @@ import {
 } from "recharts";
 
 export default function Card3() {
+    // Get data from SWR hook
     const { projects, activities } = useAppDataSWR();
 
-    // Calculate total hours per project
-    const projectHours = projects.map(project => {
-        const projectActivities = activities.filter(a => a.proyecto_id === project.id);
-        const totalMinutes = projectActivities.reduce((acc, activity) => acc + activity.minutos, 0);
-        const totalHours = parseFloat((totalMinutes / 60).toFixed(2));
-
-        return {
-            name: project.nombre,
-            value: totalHours,
-        };
-    });
+    // Get processed data for the chart
+    const projectHours = getProjectHoursData(projects, activities);
 
     // Calculate total hours for center text
     const totalHours = projectHours.reduce((acc, project) => acc + project.value, 0);
@@ -47,13 +52,15 @@ export default function Card3() {
             <CardContent className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
+                        {/* Donut chart configuration */}
                         <Pie
                             data={projectHours}
-                            innerRadius="60%"
+                            innerRadius="60%" // Creates the donut hole
                             outerRadius="80%"
-                            paddingAngle={2}
+                            paddingAngle={2} // Space between segments
                             dataKey="value"
                         >
+                            {/* Create colored segments for each project */}
                             {projectHours.map((entry, index) => (
                                 <Cell 
                                     key={`cell-${index}`} 
@@ -61,6 +68,8 @@ export default function Card3() {
                                 />
                             ))}
                         </Pie>
+
+                        {/* Enhanced tooltip with hours and percentage */}
                         <Tooltip 
                             content={({ active, payload }) => {
                                 if (active && payload && payload.length) {
@@ -98,6 +107,7 @@ export default function Card3() {
                             }}
                         />
                         <Legend />
+
                         {/* Center text showing total hours */}
                         <text
                             x="50%"

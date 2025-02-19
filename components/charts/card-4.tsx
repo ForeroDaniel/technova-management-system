@@ -1,7 +1,23 @@
+/**
+ * Card4 Component - Weekly Workload Chart
+ * 
+ * Displays a stacked bar chart showing employee workload distribution:
+ * - Each bar represents an employee
+ * - Bar segments show hours worked per week
+ * - Different colors represent different weeks
+ * - Stacking shows total hours and distribution
+ * 
+ * Features:
+ * - Automatic week number calculation
+ * - Detailed tooltips with hours breakdown
+ * - Color-coded weeks for easy tracking
+ */
+
 'use client'
 
 import { Card, CardHeader, CardDescription, CardContent, CardTitle } from "@/components/ui/card"; 
 import { useAppDataSWR } from "@/hooks/useApiData";
+import { getEmployeeWorkloadData } from "@/utils/chart-data";
 import {
     Bar,
     BarChart,
@@ -14,47 +30,13 @@ import {
 } from "recharts";
 
 export default function Card4() {
+    // Get data from SWR hook
     const { activities, employees } = useAppDataSWR();
 
-    // Function to get week number from date
-    const getWeekNumber = (date: string) => {
-        const d = new Date(date);
-        d.setHours(0, 0, 0, 0);
-        d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-        const yearStart = new Date(d.getFullYear(), 0, 1);
-        const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
-        return `Semana ${weekNo}`;
-    };
+    // Get processed data for the chart
+    const { data: workloadByEmployee, weeks: uniqueWeeks } = getEmployeeWorkloadData(employees, activities);
 
-    // First, get all unique weeks
-    const uniqueWeeks = [...new Set(activities.map(a => getWeekNumber(a.fecha)))].sort((a, b) => {
-        const weekA = parseInt(a.split(' ')[1]);
-        const weekB = parseInt(b.split(' ')[1]);
-        return weekA - weekB;
-    });
-
-    // Group activities by employee and week
-    const workloadByEmployee = employees.map(employee => {
-        const employeeActivities = activities.filter(a => a.empleado_id === employee.id);
-        const weeklyHours = uniqueWeeks.reduce((acc, week) => {
-            const activitiesInWeek = employeeActivities.filter(a => getWeekNumber(a.fecha) === week);
-            const totalHours = activitiesInWeek.reduce((sum, activity) => sum + activity.minutos / 60, 0);
-            return {
-                ...acc,
-                [week]: parseFloat(totalHours.toFixed(2))
-            };
-        }, {});
-
-        return {
-            name: employee.nombre,
-            ...weeklyHours,
-            total: parseFloat(
-                (employeeActivities.reduce((sum, activity) => sum + activity.minutos / 60, 0)).toFixed(2)
-            )
-        };
-    });
-
-    // Generate colors for each week
+    // Define colors for different weeks
     const COLORS = [
         'hsl(var(--chart-1))',
         'hsl(var(--chart-2))',
@@ -72,6 +54,7 @@ export default function Card4() {
             <CardContent className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={workloadByEmployee}>
+                        {/* Axes configuration */}
                         <XAxis
                             dataKey="name"
                             stroke="#888888"
@@ -86,6 +69,8 @@ export default function Card4() {
                             axisLine={false}
                             tickFormatter={(value) => `${value.toFixed(1)}h`}
                         />
+
+                        {/* Enhanced tooltip with detailed breakdown */}
                         <Tooltip
                             content={({ active, payload, label }: TooltipProps<number, string>) => {
                                 if (active && payload && payload.length) {
@@ -96,6 +81,7 @@ export default function Card4() {
                                                     {label}
                                                 </p>
                                                 <div className="grid gap-1">
+                                                    {/* Show hours for each week */}
                                                     {payload.map((entry, index) => (
                                                         <div key={index} className="flex items-center justify-between gap-2">
                                                             <div className="flex items-center gap-1">
@@ -112,13 +98,16 @@ export default function Card4() {
                                                             </span>
                                                         </div>
                                                     ))}
+                                                    {/* Show total hours */}
                                                     <div className="border-t pt-1 mt-1">
                                                         <div className="flex items-center justify-between">
                                                             <span className="text-[0.70rem] uppercase text-muted-foreground">
                                                                 Total
                                                             </span>
                                                             <span className="font-bold">
-                                                                {payload.reduce((sum, entry) => sum + (entry.value || 0), 0).toFixed(1)}h
+                                                                {payload.reduce((sum, entry) => 
+                                                                    sum + (entry.value || 0), 0
+                                                                ).toFixed(1)}h
                                                             </span>
                                                         </div>
                                                     </div>
@@ -131,6 +120,8 @@ export default function Card4() {
                             }}
                         />
                         <Legend />
+
+                        {/* Create stacked bars for each week */}
                         {uniqueWeeks.map((week, index) => (
                             <Bar
                                 key={week}

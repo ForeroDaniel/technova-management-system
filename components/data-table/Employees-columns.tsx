@@ -1,19 +1,26 @@
+/**
+ * Employee Table Column Definitions
+ * 
+ * This file defines the structure and behavior of columns in the employees table.
+ * It includes:
+ * - Column data type definitions (Employee interface)
+ * - Column configurations for each field
+ * - Custom cell renderers for currency formatting
+ * - Action menu configuration for row operations
+ * 
+ * Features:
+ * - Sortable name column
+ * - Currency formatting for cost per hour
+ * - Action dropdown menu for edit/delete operations
+ */
+
 "use client"
 
-// Import necessary components and types for table column definitions
+import { Employee } from "@/types"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ActionCell } from "@/components/data-table/action-cell"
-
-// Define the shape of our Employee data type
-export type Employee = {
-  id: number
-  nombre: string
-  correo_electronico: string
-  equipo: string
-  costo_por_hora: number
-}
 
 // Define table columns configuration
 export const columns = (onUpdate: () => Promise<void>): ColumnDef<Employee>[] => [
@@ -45,7 +52,7 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Employee>[] =>
     accessorKey: "equipo",
     header: "Equipo",
   },
-  // Cost per hour column - with number formatting and sorting
+  // Cost per hour column - with currency formatting and sorting
   {
     accessorKey: "costo_por_hora",
     header: ({ column }) => {
@@ -63,6 +70,7 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Employee>[] =>
       )
     },
     cell: ({ row }) => {
+      // Format amount as USD currency
       const amount = parseFloat(row.getValue("costo_por_hora"));
       const formatted = new Intl.NumberFormat("en", {
         style: "currency",
@@ -72,7 +80,7 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Employee>[] =>
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
-  // Actions column - dropdown menu with edit/delete options
+  // Actions column - with edit/delete functionality
   {
     id: "actions",
     enableHiding: false,

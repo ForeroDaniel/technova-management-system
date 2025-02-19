@@ -1,20 +1,23 @@
 /**
- * Generic Data Table Component
+ * DataTable Component
  * 
- * Features:
- * - Pagination: Navigate through large datasets with Previous/Next controls
- * - Column Filtering: Filter data based on user input
- * - Sorting: Sort data when enabled in column definitions
- * - Responsive Design: Adapts to different screen sizes
- * - Type Safety: Fully typed with TypeScript for data integrity
+ * A reusable table component with advanced features:
+ * - Column sorting
+ * - Text filtering
+ * - Pagination
+ * - Custom create button
+ * - Empty state handling
  * 
- * Technical Implementation:
- * - Built on TanStack Table (React Table) for core functionality
- * - Uses shadcn/ui components for consistent UI elements
- * - Implements controlled components pattern for state management
+ * Built on top of @tanstack/react-table with shadcn/ui components.
  * 
- * @template TData - Type for the data items being displayed (e.g., User, Product)
- * @template TValue - Type for the individual cell values
+ * Usage:
+ * <DataTable
+ *   columns={columns}
+ *   data={data}
+ *   filterColumn="name"
+ *   filterPlaceholder="Search..."
+ *   createButton={<CreateButton />}
+ * />
  */
 
 "use client"
@@ -43,26 +46,27 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 /**
- * Interface defining the required props for the DataTable component
- * 
- * @property columns - Array of column definitions that specify how to display and handle data
- * @property data - Array of data items to be displayed in the table
- * @property filterColumn - Optional name of the column to enable filtering (defaults to "nombre")
- * @property filterPlaceholder - Optional placeholder text for the filter input
- * @property createButtonText - Optional text for the create button (legacy support)
- * @property createButton - Optional custom create button component
- * @property initialSorting - Optional initial sorting state
+ * Props definition for the DataTable component
  */
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  filterColumn?: string
-  filterPlaceholder?: string
-  createButtonText?: string
-  createButton?: React.ReactNode
-  initialSorting?: { id: string; desc: boolean }[]
+  columns: ColumnDef<TData, TValue>[]    // Column definitions
+  data: TData[]                          // Table data
+  filterColumn?: string                  // Column to filter by
+  filterPlaceholder?: string            // Placeholder for filter input
+  createButtonText?: string             // Text for create button
+  createButton?: React.ReactNode        // Custom create button component
+  initialSorting?: {                    // Initial sorting configuration
+    id: string
+    desc: boolean
+  }[]
 }
 
+/**
+ * DataTable Component
+ * 
+ * A flexible table component that handles data display, sorting,
+ * filtering, and pagination.
+ */
 export function DataTable<TData, TValue>({
   columns,
   data,
@@ -75,29 +79,26 @@ export function DataTable<TData, TValue>({
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [sorting, setSorting] = React.useState<SortingState>(initialSorting)
 
-    /**
-     * Table initialization using useReactTable hook
-     * Configures core functionality:
-     * - Core row model for basic table structure
-     * - Pagination model for data segmentation
-     * - Sorting model for column sorting
-     * - Filtering model for data filtering
-     */
+    
     const table = useReactTable({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
-        getFilteredRowModel: getFilteredRowModel(),
         state: {
             sorting,
             columnFilters,
         },
     })
 
+    /**
+     * Renders the create button based on provided props
+     * Returns custom button, text button, or null
+     */
     const renderCreateButton = () => {
         if (createButton) return createButton;
         if (createButtonText) return <Button variant="default">{createButtonText}</Button>;
@@ -106,8 +107,9 @@ export function DataTable<TData, TValue>({
 
     return (
         <div>
-            {/* Search/filter input field */}
+            {/* Search and create button section */}
             <div className="flex items-center py-4 gap-2">
+                {/* Filter input */}
                 <Input
                     placeholder={filterPlaceholder}
                     value={(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""}
@@ -122,6 +124,7 @@ export function DataTable<TData, TValue>({
             {/* Main table structure */}
             <div className="rounded-md border">
                 <Table>
+                    {/* Table header */}
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
@@ -138,6 +141,8 @@ export function DataTable<TData, TValue>({
                             </TableRow>
                         ))}
                     </TableHeader>
+
+                    {/* Table body */}
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
@@ -167,7 +172,6 @@ export function DataTable<TData, TValue>({
             <div className="flex items-center justify-end space-x-2 py-4">
                 <Button
                     variant="outline"
-                    size="sm"
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
                 >
@@ -175,7 +179,6 @@ export function DataTable<TData, TValue>({
                 </Button>
                 <Button
                     variant="outline"
-                    size="sm"
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
                 >

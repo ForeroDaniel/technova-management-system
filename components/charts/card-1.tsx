@@ -1,7 +1,18 @@
+/**
+ * Card1 Component - Total Cost Per Project Chart
+ * 
+ * Displays a bar chart showing the total cost of each project.
+ * The cost is calculated by:
+ * 1. Finding all activities for each project
+ * 2. Calculating the cost of each activity based on employee rates
+ * 3. Summing up all activity costs per project
+ */
+
 'use client'
 
 import { Card, CardHeader, CardDescription, CardContent, CardTitle } from "@/components/ui/card";
 import { useAppDataSWR } from "@/hooks/useApiData";
+import { getProjectCostsData } from "@/utils/chart-data";
 import {
     Bar,
     BarChart,
@@ -12,35 +23,24 @@ import {
 } from "recharts";
 
 export default function Card1() {
+    // Get data from SWR hook
     const { projects, activities, employees } = useAppDataSWR();
 
-    // Calculate total cost per project
-    const projectCosts = projects.map(project => {
-        const projectActivities = activities.filter(a => a.proyecto_id === project.id);
-        const totalCost = projectActivities.reduce((acc, activity) => {
-            const employee = employees.find(e => e.id === activity.empleado_id);
-            if (!employee) return acc;
-            
-            // Formula: (minutos / 60) * costo_por_hora
-            const activityCost = (activity.minutos / 60) * employee.costo_por_hora;
-            return acc + activityCost;
-        }, 0);
-
-        return {
-            name: project.nombre,
-            cost: parseFloat(totalCost.toFixed(2)),
-        };
-    });
+    // Get processed data for the chart
+    const projectCosts = getProjectCostsData(projects, activities, employees);
 
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Costo total por proyecto</CardTitle>
-                <CardDescription>Costo de todas las actividades asociadas a un proyecto</CardDescription>
+                <CardDescription>
+                    Costo de todas las actividades asociadas a un proyecto
+                </CardDescription>
             </CardHeader>
             <CardContent className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={projectCosts}>
+                        {/* X-axis configuration */}
                         <XAxis
                             dataKey="name"
                             stroke="#888888"
@@ -48,6 +48,7 @@ export default function Card1() {
                             tickLine={false}
                             axisLine={false}
                         />
+                        {/* Y-axis configuration with currency format */}
                         <YAxis
                             stroke="#888888"
                             fontSize={12}
@@ -55,11 +56,13 @@ export default function Card1() {
                             axisLine={false}
                             tickFormatter={(value) => `$${value}`}
                         />
+                        {/* Bar configuration */}
                         <Bar
-                            dataKey="cost"
+                            dataKey="value"
                             radius={[4, 4, 0, 0]}
                             fill="hsl(var(--chart-1))"
                         />
+                        {/* Tooltip configuration */}
                         <Tooltip 
                             content={({ active, payload }) => {
                                 if (active && payload && payload.length) {

@@ -1,7 +1,19 @@
+/**
+ * Card2 Component - Project Profitability Chart
+ * 
+ * Displays a bar chart comparing three key financial metrics for each project:
+ * 1. Budget (presupuesto) - The allocated budget
+ * 2. Cost (costo) - Total cost of all activities
+ * 3. Profitability (rentabilidad) - The difference between budget and cost
+ * 
+ * Each metric is shown as a separate bar for easy comparison.
+ */
+
 'use client'
 
 import { Card, CardHeader, CardDescription, CardContent, CardTitle } from "@/components/ui/card"; 
 import { useAppDataSWR } from "@/hooks/useApiData";
+import { getProjectProfitabilityData } from "@/utils/chart-data";
 import {
     Bar,
     BarChart,
@@ -13,40 +25,24 @@ import {
 } from "recharts";
 
 export default function Card2() {
+    // Get data from SWR hook
     const { projects, activities, employees } = useAppDataSWR();
 
-    // Calculate budget vs cost data for each project
-    const projectComparison = projects.map(project => {
-        const projectActivities = activities.filter(a => a.proyecto_id === project.id);
-        const totalCost = projectActivities.reduce((acc, activity) => {
-            const employee = employees.find(e => e.id === activity.empleado_id);
-            if (!employee) return acc;
-            
-            // Formula: (minutos / 60) * costo_por_hora
-            const activityCost = (activity.minutos / 60) * employee.costo_por_hora;
-            return acc + activityCost;
-        }, 0);
-
-        // Calculate gross profitability
-        const grossProfitability = project.presupuesto - totalCost;
-
-        return {
-            name: project.nombre,
-            presupuesto: parseFloat(project.presupuesto.toFixed(2)),
-            costo: parseFloat(totalCost.toFixed(2)),
-            rentabilidad: parseFloat(grossProfitability.toFixed(2))
-        };
-    });
+    // Get processed data for the chart
+    const projectComparison = getProjectProfitabilityData(projects, activities, employees);
 
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Rentabilidad bruta</CardTitle>
-                <CardDescription>Costo total del proyecto con respecto a su presupuesto</CardDescription>
+                <CardDescription>
+                    Costo total del proyecto con respecto a su presupuesto
+                </CardDescription>
             </CardHeader>
             <CardContent className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={projectComparison}>
+                        {/* Axes configuration */}
                         <XAxis
                             dataKey="name"
                             stroke="#888888"
@@ -61,6 +57,8 @@ export default function Card2() {
                             axisLine={false}
                             tickFormatter={(value) => `$${value}`}
                         />
+                        
+                        {/* Enhanced tooltip with detailed information */}
                         <Tooltip 
                             content={({ active, payload }) => {
                                 if (active && payload && payload.length) {
@@ -71,6 +69,7 @@ export default function Card2() {
                                                     {payload[0].payload.name}
                                                 </p>
                                                 <div className="grid grid-cols-2 gap-2">
+                                                    {/* Budget info */}
                                                     <div className="flex flex-col">
                                                         <span className="text-[0.70rem] uppercase text-muted-foreground">
                                                             Presupuesto
@@ -79,6 +78,7 @@ export default function Card2() {
                                                             ${payload[0].value}
                                                         </span>
                                                     </div>
+                                                    {/* Cost info */}
                                                     <div className="flex flex-col">
                                                         <span className="text-[0.70rem] uppercase text-muted-foreground">
                                                             Costo
@@ -87,6 +87,7 @@ export default function Card2() {
                                                             ${payload[1].value}
                                                         </span>
                                                     </div>
+                                                    {/* Profitability info */}
                                                     <div className="flex flex-col col-span-2">
                                                         <span className="text-[0.70rem] uppercase text-muted-foreground">
                                                             Rentabilidad
@@ -103,7 +104,11 @@ export default function Card2() {
                                 return null;
                             }}
                         />
+                        
+                        {/* Chart legend */}
                         <Legend />
+                        
+                        {/* Bars for each metric */}
                         <Bar
                             name="Presupuesto"
                             dataKey="presupuesto"

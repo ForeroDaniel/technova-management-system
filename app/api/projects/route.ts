@@ -1,8 +1,15 @@
 /**
- * Projects API Route
+ * Projects API Routes
  * 
- * This file handles API requests related to projects in the application.
- * It provides endpoints for interacting with the projects data in the Supabase database.
+ * Handles CRUD operations for projects:
+ * - GET: Fetch all projects
+ * - POST: Create new project
+ * 
+ * Features:
+ * - Supabase integration
+ * - Error handling
+ * - Input validation
+ * - Type safety
  */
 
 import { NextResponse } from 'next/server';
@@ -11,10 +18,7 @@ import { supabase } from '@/app/lib/supabase';
 /**
  * GET /api/projects
  * 
- * Fetches all projects from the Supabase project table.
- * @returns {Promise<NextResponse>} JSON response containing:
- * - On success: { data: Project[] }
- * - On error: { error: string } with appropriate status code
+ * Fetches all projects from the database.
  */
 export async function GET() {
   try {
@@ -23,13 +27,18 @@ export async function GET() {
       .select('*');
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Supabase error:', error);
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ data });
   } catch (error) {
+    console.error('Server error:', error);
     return NextResponse.json(
-      { error: 'Error fetching projects' },
+      { error: 'Error al obtener proyectos' },
       { status: 500 }
     );
   }
@@ -39,13 +48,22 @@ export async function GET() {
  * POST /api/projects
  * 
  * Creates a new project in the database.
- * @returns {Promise<NextResponse>} JSON response containing:
- * - On success: { data: Project }
- * - On error: { error: string } with appropriate status code
+ * Validates required fields and returns the created project.
  */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    
+    // Validate required fields
+    const requiredFields = ['nombre', 'compania', 'presupuesto', 'fecha_inicio', 'fecha_fin'];
+    const missingFields = requiredFields.filter(field => !body[field]);
+
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        { error: `Campos requeridos faltantes: ${missingFields.join(', ')}` },
+        { status: 400 }
+      );
+    }
     
     const { data, error } = await supabase
       .from('project')
@@ -60,13 +78,18 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Supabase error:', error);
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ data });
   } catch (error) {
+    console.error('Server error:', error);
     return NextResponse.json(
-      { error: 'Error creating project' },
+      { error: 'Error al crear proyecto' },
       { status: 500 }
     );
   }

@@ -1,8 +1,15 @@
 /**
- * Employees API Route
+ * Employees API Routes
  * 
- * This file handles API requests related to employees in the application.
- * It provides endpoints for interacting with the employees data in the Supabase database.
+ * Handles CRUD operations for employees:
+ * - GET: Fetch all employees
+ * - POST: Create new employee
+ * 
+ * Features:
+ * - Supabase integration
+ * - Error handling
+ * - Input validation
+ * - Type safety
  */
 
 import { NextResponse } from 'next/server';
@@ -11,10 +18,7 @@ import { supabase } from '@/app/lib/supabase';
 /**
  * GET /api/employees
  * 
- * Fetches all employees from the Supabase employee table.
- * @returns {Promise<NextResponse>} JSON response containing:
- * - On success: { data: Employee[] }
- * - On error: { error: string } with appropriate status code
+ * Fetches all employees from the database.
  */
 export async function GET() {
   try {
@@ -23,13 +27,18 @@ export async function GET() {
       .select('*');
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Supabase error:', error);
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ data });
   } catch (error) {
+    console.error('Server error:', error);
     return NextResponse.json(
-      { error: 'Error fetching employees' },
+      { error: 'Error al obtener empleados' },
       { status: 500 }
     );
   }
@@ -38,14 +47,23 @@ export async function GET() {
 /**
  * POST /api/employees
  * 
- * Creates a new employee in the Supabase employee table.
- * @returns {Promise<NextResponse>} JSON response containing:
- * - On success: { data: Employee }
- * - On error: { error: string } with appropriate status code
+ * Creates a new employee in the database.
+ * Validates required fields and returns the created employee.
  */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    
+    // Validate required fields
+    const requiredFields = ['nombre', 'correo_electronico', 'equipo', 'costo_por_hora'];
+    const missingFields = requiredFields.filter(field => body[field] === undefined);
+
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        { error: `Campos requeridos faltantes: ${missingFields.join(', ')}` },
+        { status: 400 }
+      );
+    }
     
     const { data, error } = await supabase
       .from('employee')
@@ -59,13 +77,18 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Supabase error:', error);
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ data });
   } catch (error) {
+    console.error('Server error:', error);
     return NextResponse.json(
-      { error: 'Error creating employee' },
+      { error: 'Error al crear empleado' },
       { status: 500 }
     );
   }

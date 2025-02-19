@@ -1,22 +1,26 @@
+/**
+ * Project Table Columns Configuration
+ * 
+ * Defines the column structure for the projects table, including:
+ * - Sortable columns (name, budget, start date)
+ * - Formatted columns (budget in USD, dates in Spanish format)
+ * - Action column with edit/delete functionality
+ * 
+ * Built with Tanstack Table column definitions.
+ */
+
 "use client"
 
-// Import necessary components and types for table column definitions
+import { Project } from "@/types"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ActionCell } from "@/components/data-table/action-cell"
 
-// Define the shape of our Project data type
-export type Project = {
-  id: number
-  nombre: string
-  compania: string
-  presupuesto: number
-  fecha_inicio: string
-  fecha_fin: string
-}
-
-// Define table columns configuration
+/**
+ * Column definitions for the projects table
+ * @param onUpdate - Callback function to refresh data after modifications
+ */
 export const columns = (onUpdate: () => Promise<void>): ColumnDef<Project>[] => [
   // Name column - with sorting
   {
@@ -34,12 +38,12 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Project>[] => 
       )
     },
   },
-  // Company column
+  // Company column - simple text display
   {
     accessorKey: "compania",
     header: "Compañía",
   },
-  // Budget column - with currency formatting
+  // Budget column - with currency formatting and sorting
   {
     accessorKey: "presupuesto",
     header: ({ column }) => {
@@ -49,7 +53,7 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Project>[] => 
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="flex items-center pr-0 ml-auto"
-            >
+          >
             Presupuesto
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
@@ -57,6 +61,7 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Project>[] => 
       )
     },
     cell: ({ row }) => {
+      // Format budget as USD currency
       const amount = parseFloat(row.getValue("presupuesto"))
       const formatted = new Intl.NumberFormat("en", {
         style: "currency",
@@ -67,7 +72,7 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Project>[] => 
       return <div className="text-right font-medium">{formatted}</div>
     },
   },
-  // Start date column
+  // Start date column - with sorting and date formatting
   {
     accessorKey: "fecha_inicio",
     header: ({ column }) => {
@@ -83,22 +88,24 @@ export const columns = (onUpdate: () => Promise<void>): ColumnDef<Project>[] => 
       )
     },
     cell: ({ row }) => {
+      // Format date in Spanish locale
       const date = new Date(row.getValue("fecha_inicio"))
       return <div>{date.toLocaleDateString('es-ES')}</div>
     },
     sortingFn: "datetime",
     sortDescFirst: true,
   },
-  // End date column
+  // End date column - with date formatting
   {
     accessorKey: "fecha_fin",
     header: "Fecha Fin",
     cell: ({ row }) => {
+      // Format date in Spanish locale
       const date = new Date(row.getValue("fecha_fin"))
       return <div>{date.toLocaleDateString('es-ES')}</div>
     },
   },
-  // Actions column
+  // Actions column - with edit/delete functionality
   {
     id: "actions",
     enableHiding: false,

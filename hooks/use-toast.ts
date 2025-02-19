@@ -1,6 +1,11 @@
 "use client"
 
-// by react-hot-toast library
+// !!!                            !!!
+// !!!                            !!!
+// !!! BY REACT-HOT-TOAST LIBRARY !!! 
+// !!!                            !!!
+// !!!                            !!!
+
 import * as React from "react"
 
 import type {

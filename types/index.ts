@@ -26,4 +26,9 @@ export interface Activity {
   fecha: string
   empleado_nombre?: string
   proyecto_nombre?: string
-} 
+}
+
+// Entity Type Definitions
+export type EntityTypeSingular = 'activity' | 'project' | 'employee'
+export type EntityTypePlural = 'activities' | 'projects' | 'employees'
+export type EntityType = EntityTypeSingular | EntityTypePlural 

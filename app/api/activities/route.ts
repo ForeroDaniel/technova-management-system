@@ -1,8 +1,16 @@
 /**
- * Activities API Route
+ * Activities API Routes
  * 
- * This file handles API requests related to activities in the application.
- * It provides endpoints for interacting with the activities data in the Supabase database.
+ * Handles CRUD operations for activities:
+ * - GET: Fetch all activities with related data
+ * - POST: Create new activity
+ * 
+ * Features:
+ * - Supabase integration
+ * - Error handling
+ * - Data transformation
+ * - Type safety
+ * - Input validation
  */
 
 import { NextResponse } from 'next/server';
@@ -12,16 +20,11 @@ import { supabase } from '@/app/lib/supabase';
  * GET /api/activities
  * 
  * Fetches all activities with related employee and project data.
- * Fetches all activities from the Supabase activity table with related employee and project names.
- * Uses Supabase's nested selection to join with related tables:
- * - Joins with employees table using employee_id
- * - Joins with projects table using project_id
- * @returns {Promise<NextResponse>} JSON response containing:
- * - On success: { data: Activity[] }
- * - On error: { error: string } with appropriate status code
+ * Transforms the response to include employee and project names.
  */
 export async function GET() {
   try {
+    // Fetch activities with related data
     const { data, error } = await supabase
       .from('activity')
       .select(`
@@ -31,7 +34,11 @@ export async function GET() {
       `);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Supabase error:', error);
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      );
     }
 
     // Transform the nested data to include employee and project names
@@ -43,8 +50,9 @@ export async function GET() {
 
     return NextResponse.json({ data: transformedData });
   } catch (error) {
+    console.error('Server error:', error);
     return NextResponse.json(
-      { error: 'Error fetching activities' },
+      { error: 'Error al obtener actividades' },
       { status: 500 }
     );
   }
@@ -54,11 +62,24 @@ export async function GET() {
  * POST /api/activities
  * 
  * Creates a new activity in the database.
+ * Validates required fields and returns the created activity.
  */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     
+    // Validate required fields
+    const requiredFields = ['descripcion', 'tipo', 'minutos', 'empleado_id', 'proyecto_id', 'fecha'];
+    const missingFields = requiredFields.filter(field => !body[field]);
+    
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        { error: `Campos requeridos faltantes: ${missingFields.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    // Create new activity
     const { data, error } = await supabase
       .from('activity')
       .insert([{
@@ -73,13 +94,18 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Supabase error:', error);
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ data });
   } catch (error) {
+    console.error('Server error:', error);
     return NextResponse.json(
-      { error: 'Error creating activity' },
+      { error: 'Error al crear actividad' },
       { status: 500 }
     );
   }
