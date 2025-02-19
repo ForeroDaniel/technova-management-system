@@ -49,7 +49,7 @@ A modern, full-stack web application for managing projects, activities, and empl
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/your-username/technova-management-system.git
+git clone https://github.com/ForeroDaniel/technova-management-system.git
 cd technova-management-system
 ```
 
