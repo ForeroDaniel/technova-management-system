@@ -30,8 +30,8 @@ const geistMono = Geist_Mono({
 
 // Define metadata for SEO
 export const metadata: Metadata = {
-  title: "Plataforma de Gestión",
-  description: "Plataforma para la gestión de actividades, proyectos y empleados",
+  title: "Technova Management System",
+  description: "Sistema de gestión para la plataforma de Technova",
 };
 
 export default function RootLayout({
