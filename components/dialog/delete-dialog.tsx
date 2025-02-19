@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { mutate } from "swr"
+import { useToast } from "@/hooks/use-toast"
 
 interface DeleteDialogProps<T> {
   entity: T
@@ -31,11 +32,17 @@ export function DeleteDialog<T extends { id: number }>({
 }: DeleteDialogProps<T>) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast()
+
+  const getWarningMessage = () => {
+    return `¿Estás seguro de que deseas eliminar ${entityName.toLowerCase() === 'actividad' ? 'la' : 'el'} ${entityName.toLowerCase()}? Esta acción no se puede deshacer.`
+  }
 
   const handleDelete = async () => {
+    setIsDeleting(true)
+    setError(null)
+
     try {
-      setIsDeleting(true)
-      setError(null)
       const response = await fetch(`${entityEndpoint}/${entity.id}`, {
         method: 'DELETE',
       })
@@ -45,27 +52,26 @@ export function DeleteDialog<T extends { id: number }>({
         throw new Error(errorData.error || `Error al eliminar ${entityName.toLowerCase()}`)
       }
 
+      // Show success toast
+      toast({
+        title: `${entityName} ${entityName.toLowerCase() === 'actividad' ? 'eliminada' : 'eliminado'}`,
+        description: `${entityName} se ha eliminado correctamente.`,
+      })
+
       onOpenChange(false)
       await mutate(entityEndpoint)
       await onUpdate()
     } catch (error) {
-      console.error(`Error al eliminar ${entityName.toLowerCase()}:`, error)
-      setError((error as Error).message)
+      const errorMessage = error instanceof Error ? error.message : "Ha ocurrido un error inesperado"
+      setError(errorMessage)
+      // Show error toast
+      toast({
+        variant: "destructive",
+        title: `Error al eliminar ${entityName.toLowerCase()}`,
+        description: errorMessage,
+      })
     } finally {
       setIsDeleting(false)
-    }
-  }
-
-  const getWarningMessage = () => {
-    switch (entityName.toLowerCase()) {
-      case 'proyecto':
-        return '¿Estás seguro de que deseas eliminar este proyecto? Se eliminarán también todas las actividades asociadas a este proyecto. Esta acción no se puede deshacer.'
-      case 'empleado':
-        return '¿Estás seguro de que deseas eliminar este empleado? Se eliminarán también todas las actividades registradas por este empleado. Esta acción no se puede deshacer.'
-      case 'actividad':
-        return '¿Estás seguro de que deseas eliminar esta actividad? Esta acción no se puede deshacer.'
-      default:
-        return '¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer.'
     }
   }
 

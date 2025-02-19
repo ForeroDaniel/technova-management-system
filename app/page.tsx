@@ -8,12 +8,14 @@
  * @returns {JSX.Element} The rendered home page with navigation
  */
 
-import Navbar from "@/components/navbar";
+import ChartContainer from "@/components/charts/chart-container";
+import TabsComponent from "@/components/tabs";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <Navbar />
+    <div className="flex flex-col items-center min-h-screen">
+      <ChartContainer />
+      <TabsComponent />
     </div>
   );
 }

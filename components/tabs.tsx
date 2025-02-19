@@ -17,11 +17,11 @@
 import EntityTable from "@/components/data-table/entity-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
-export default function Navbar() {
+export default function TabsComponent() {
   return (
     <Tabs defaultValue="activities" className="w-full max-w-[1000px] mx-auto flex flex-col min-h-screen">
       <div className="w-full bg-background">
-        <div className="flex justify-center py-14">
+        <div className="flex justify-center pt-16 mt-16 ">
           <TabsList className="h-10">
             <TabsTrigger value="activities">Actividades</TabsTrigger>
             <TabsTrigger value="projects">Proyectos</TabsTrigger>

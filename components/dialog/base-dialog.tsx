@@ -38,6 +38,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { mutate } from 'swr'
+import { useToast } from "@/hooks/use-toast"
 
 export interface SelectOption {
   value: string
@@ -81,6 +82,7 @@ type BaseDialogProps<T> = CreateDialogProps | EditDialogProps<T>
 
 export function BaseDialog<T extends { id?: number }>(props: BaseDialogProps<T>) {
   const [internalOpen, setInternalOpen] = useState(false)
+  const { toast } = useToast()
   
   const isCreateMode = props.mode === 'create'
   const open = isCreateMode ? internalOpen : props.open
@@ -150,6 +152,12 @@ export function BaseDialog<T extends { id?: number }>(props: BaseDialogProps<T>)
         (props as EditDialogProps<T>).onSave(responseData);
       }
       
+      // Show success toast
+      toast({
+        title: `${props.entityName} ${props.entityName.toLowerCase() === 'actividad' ? (isCreateMode ? 'creada' : 'actualizada') : (isCreateMode ? 'creado' : 'actualizado')}`,
+        description: `${props.entityName} se ha ${isCreateMode ? 'creado' : 'actualizado'} correctamente.`,
+      });
+      
       // Revalidate the data using SWR
       await mutate(props.entityEndpoint);
       await props.onUpdate();
@@ -158,6 +166,12 @@ export function BaseDialog<T extends { id?: number }>(props: BaseDialogProps<T>)
         form.reset();
       }
     } catch (error) {
+      // Show error toast
+      toast({
+        variant: "destructive",
+        title: `Error al ${isCreateMode ? 'crear' : 'actualizar'} ${props.entityName.toLowerCase()}`,
+        description: error instanceof Error ? error.message : "Ha ocurrido un error inesperado.",
+      });
       console.error(`Error ${isCreateMode ? 'creating' : 'updating'} ${props.entityName.toLowerCase()}:`, error);
     }
   }
