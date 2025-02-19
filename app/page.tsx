@@ -13,17 +13,24 @@
 
 import ChartContainer from "@/components/charts/chart-container";
 import TabsComponent from "@/components/data-table/tabs";
+import { ProtectedPage } from "@/components/auth/protected-page";
+import Logout from "@/components/auth/logout";
 
 // Simple page that displays charts and data tables
 export default function Home() {
   return (
-    // Center everything and stack vertically
-    <div className="flex flex-col items-center">
-      {/* Charts section */}
-      <ChartContainer />
-      
-      {/* Data tables section */}
-      <TabsComponent />
-    </div>
+    <ProtectedPage>
+      {/* Center everything and stack vertically */}
+      <div className="flex flex-col items-center">
+        {/* Charts section */}
+        <ChartContainer />
+        
+        {/* Data tables section */}
+        <TabsComponent />
+
+        {/* Logout section */}
+        <Logout />
+      </div>
+    </ProtectedPage>
   );
 }

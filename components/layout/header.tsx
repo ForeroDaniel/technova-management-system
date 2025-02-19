@@ -16,7 +16,7 @@ import ThemeAwareLogo from "@/components/layout/theme-aware-logo"
 export default function Header() {
     return (
         // Main header container with full width and fixed height
-        <header className="w-full h-[400px] pb-16">
+        <header className="w-full h-[450px] pb-16">
             {/* Center content both vertically and horizontally */}
             <div className="flex flex-col justify-center items-center h-full">
                 {/* Main title with gradient effect

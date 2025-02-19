@@ -14,7 +14,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { supabase } from '@/app/lib/supabase';
+import { supabase } from '@/app/api/supabase';
 
 /**
  * PUT /api/projects/[id]
@@ -24,10 +24,10 @@ import { supabase } from '@/app/lib/supabase';
  */
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
 
     if (!id) {
       return NextResponse.json(
@@ -88,10 +88,10 @@ export async function PUT(
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
 
     if (!id) {
       return NextResponse.json(

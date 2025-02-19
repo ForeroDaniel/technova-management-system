@@ -15,7 +15,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { supabase } from '@/app/lib/supabase';
+import { supabase } from '@/app/api/supabase';
 
 /**
  * PUT /api/activities/[id]
@@ -25,10 +25,10 @@ import { supabase } from '@/app/lib/supabase';
  */
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
     const body = await request.json();
     
     // Validate required fields
@@ -109,10 +109,10 @@ export async function PUT(
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
 
     const { error } = await supabase
       .from('activity')
