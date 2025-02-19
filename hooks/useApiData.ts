@@ -1,4 +1,7 @@
-import useSWR, { mutate } from 'swr'
+'use client'
+
+import useSWR from 'swr'
+import { mutate } from 'swr'
 
 // Types from your existing code
 import type { Employee, Project, Activity } from '@/types'
@@ -58,21 +61,21 @@ export function useAppDataSWR() {
   }
 
   // Computed stats (using your existing logic)
-  const projectStats = projects.map(project => ({
+  const projectStats = projects.map((project: Project) => ({
     ...project,
     totalHours: activities
-      .filter(a => a.proyecto_id === project.id)
-      .reduce((acc, curr) => acc + (curr.minutos / 60), 0),
-    activityCount: activities.filter(a => a.proyecto_id === project.id).length
+      .filter((a: Activity) => a.proyecto_id === project.id)
+      .reduce((acc: number, curr: Activity) => acc + (curr.minutos / 60), 0),
+    activityCount: activities.filter((a: Activity) => a.proyecto_id === project.id).length
   }))
 
-  const employeeStats = employees.map(employee => ({
+  const employeeStats = employees.map((employee: Employee) => ({
     ...employee,
     totalHours: activities
-      .filter(a => a.empleado_id === employee.id)
-      .reduce((acc, curr) => acc + (curr.minutos / 60), 0),
+      .filter((a: Activity) => a.empleado_id === employee.id)
+      .reduce((acc: number, curr: Activity) => acc + (curr.minutos / 60), 0),
     projectCount: new Set(activities
-      .filter(a => a.empleado_id === employee.id)
+      .filter((a: Activity) => a.empleado_id === employee.id)
       .map(a => a.proyecto_id)).size
   }))
 

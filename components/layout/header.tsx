@@ -1,6 +1,6 @@
 "use client"
 
-import { ThemeAwareLogo } from "@/components/layout/theme-aware-logo"
+import ThemeAwareLogo  from "@/components/layout/theme-aware-logo"
 
 export default function Header() {
     return (

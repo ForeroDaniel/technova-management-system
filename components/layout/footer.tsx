@@ -1,12 +1,22 @@
 "use client"
 
+import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { Label } from "@radix-ui/react-label"
 import { useTheme } from "next-themes"
-import { ThemeAwareLogo } from "@/components/layout/theme-aware-logo"
+import ThemeAwareLogo from "./theme-aware-logo"
+import { useEffect, useState } from "react"
 
 export default function Footer() {
     const { theme, setTheme } = useTheme()
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    if (!mounted) {
+        return null
+    }
 
     return (
         <footer className="py-6 md:py-0 h-[200px]">
