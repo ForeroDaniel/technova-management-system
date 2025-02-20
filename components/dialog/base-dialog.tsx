@@ -71,7 +71,7 @@ export interface Field {
     label: string                // Display label
     type: 'text' | 'number' | 'date' | 'email' | 'select'  // Input type
     validation: z.ZodTypeAny     // Zod validation schema
-    transform?: (value: string) => any  // Optional value transformer
+    transform?: (value: string) => unknown  // Optional value transformer
     defaultValue?: string        // Default value
     options?: SelectOption[]     // Options for select fields
 }
@@ -142,8 +142,8 @@ export function BaseDialog<T extends { id?: number }>(props: BaseDialogProps<T>)
         } else {
             const entity = (props as EditDialogProps<T>).entity;
             acc[field.name] = field.type === 'number' ? 
-                (entity as any)[field.name].toString() : 
-                (entity as any)[field.name];
+                String((entity as Record<string, unknown>)[field.name]) : 
+                String((entity as Record<string, unknown>)[field.name]);
         }
         return acc;
     }, {});
@@ -160,7 +160,7 @@ export function BaseDialog<T extends { id?: number }>(props: BaseDialogProps<T>)
     const onSubmit = async (data: FormValues) => {
         try {
             // Transform field values if needed
-            const transformedData = props.fields.reduce<Record<string, any>>((acc, field) => {
+            const transformedData = props.fields.reduce<Record<string, unknown>>((acc, field) => {
                 acc[field.name] = field.transform ? 
                     field.transform(data[field.name] as string) : 
                     data[field.name];

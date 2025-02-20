@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/app/api/supabase";
+import { createBrowserClient } from "@supabase/ssr";
 import { Spinner } from "@/components/ui/spinner";
 
 interface ProtectedPageProps {
@@ -17,6 +17,16 @@ export function ProtectedPage({ children }: ProtectedPageProps) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        const supabase = createBrowserClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          {
+            auth: {
+              persistSession: true,
+            }
+          }
+        );
+        
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
           router.push("/login");

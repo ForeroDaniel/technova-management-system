@@ -43,7 +43,7 @@ export async function PUT(
     }
 
     // First update the activity
-    const { data: updatedActivity, error: updateError } = await supabase
+    const { error: updateError } = await supabase
       .from('activity')
       .update({
         descripcion: body.descripcion,

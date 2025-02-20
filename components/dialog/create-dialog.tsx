@@ -35,16 +35,18 @@ interface CreateDialogProps {
  */
 export function CreateDialog({ entityType, onUpdate }: CreateDialogProps) {
     const { refreshData } = useAppDataSWR()
+    
+    // Move hook calls to the component level
+    const activityFields = useActivityFields()
+    const projectFields = useProjectFields()
+    const employeeFields = useEmployeeFields()
 
-    /**
-     * Get configuration for the specified entity type
-     * Returns fields, endpoint, and text content
-     */
-    const getEntityConfig = () => {
+    // Get configuration for the specified entity type
+    const config = (() => {
         switch (entityType) {
             case 'activity':
                 return {
-                    fields: useActivityFields(),
+                    fields: activityFields,
                     endpoint: '/api/activities',
                     name: 'Actividad',
                     triggerText: 'Registrar Actividad',
@@ -53,7 +55,7 @@ export function CreateDialog({ entityType, onUpdate }: CreateDialogProps) {
                 }
             case 'project':
                 return {
-                    fields: useProjectFields(),
+                    fields: projectFields,
                     endpoint: '/api/projects',
                     name: 'Proyecto',
                     triggerText: 'Crear Proyecto',
@@ -62,7 +64,7 @@ export function CreateDialog({ entityType, onUpdate }: CreateDialogProps) {
                 }
             case 'employee':
                 return {
-                    fields: useEmployeeFields(),
+                    fields: employeeFields,
                     endpoint: '/api/employees',
                     name: 'Empleado',
                     triggerText: 'Crear Empleado',
@@ -70,9 +72,7 @@ export function CreateDialog({ entityType, onUpdate }: CreateDialogProps) {
                     description: 'Agrega un nuevo empleado al sistema.'
                 }
         }
-    }
-
-    const config = getEntityConfig()
+    })()
 
     return (
         <BaseDialog

@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { supabase } from "@/app/api/supabase"; 
+import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 
 export function LoginForm({
@@ -31,7 +31,17 @@ export function LoginForm({
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          auth: {
+            persistSession: true,
+          }
+        }
+      );
+
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -41,7 +51,7 @@ export function LoginForm({
       } else {
         router.push("/"); // Redirect to a protected route after successful login
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);

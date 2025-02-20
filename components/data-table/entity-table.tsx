@@ -16,19 +16,20 @@
 "use client"
 
 import { DataTable } from '@/components/data-table/table'
-import { columns as projectColumns } from '@/components/data-table/projects-columns'
-import { columns as employeeColumns } from '@/components/data-table/employees-columns'
-import { columns as activityColumns } from '@/components/data-table/activities-columns'
+import { columns as projectColumns } from './projects-columns'
+import { columns as employeeColumns } from './employees-columns'
+import { columns as activityColumns } from './activities-columns'
 import { CreateDialog } from '@/components/dialog/create-dialog'
 import { useAppDataSWR } from '@/hooks/useApiData'
-import { EntityTypePlural, EntityTypeSingular } from '@/types'
+import { EntityTypePlural, EntityTypeSingular, Activity, Project, Employee } from '@/types'
 import { Spinner } from '@/components/ui/spinner'
+import { ColumnDef } from '@tanstack/react-table'
 
 /**
  * Configuration type for each entity
  * Defines how the table should behave for different entity types
  */
-type EntityConfig = {
+type EntityConfig<T> = {
     title: string                   // Display title
     filterColumn: string           // Column to filter by
     filterPlaceholder: string      // Filter input placeholder
@@ -36,8 +37,8 @@ type EntityConfig = {
         id: string
         desc: boolean
     }[]
-    getColumns: (onUpdate: () => Promise<void>) => any  // Column definitions
-    getData: (data: ReturnType<typeof useAppDataSWR>) => any[]  // Data selector
+    getColumns: (onUpdate: () => Promise<void>) => ColumnDef<T>[]  // Column definitions
+    getData: (data: ReturnType<typeof useAppDataSWR>) => T[]  // Data selector
     createEntityType: EntityTypeSingular  // Type for create dialog
 }
 
@@ -45,7 +46,11 @@ type EntityConfig = {
  * Configuration for each entity type
  * Defines specific behavior and display options
  */
-const entityConfigs: Record<EntityTypePlural, EntityConfig> = {
+const entityConfigs: {
+    activities: EntityConfig<Activity>
+    projects: EntityConfig<Project>
+    employees: EntityConfig<Employee>
+} = {
     // Activities configuration
     activities: {
         title: 'Actividades',
@@ -96,8 +101,17 @@ export default function EntityTable({ entityType }: EntityTableProps) {
     const { refreshData, isLoading } = appData
     const config = entityConfigs[entityType]
 
-    // Get data for the current entity type
+    // Get data and columns with proper typing based on entity type
     const data = config.getData(appData)
+    const columns = config.getColumns(refreshData)
+
+    // Type assertion helper based on entity type
+    type EntityTypeMap = {
+        'activities': Activity
+        'projects': Project
+        'employees': Employee
+    }
+    type CurrentEntity = EntityTypeMap[typeof entityType]
 
     return (
         <div className="p-4">
@@ -109,9 +123,9 @@ export default function EntityTable({ entityType }: EntityTableProps) {
             ) : data.length === 0 ? (
                 <p>No hay {config.title.toLowerCase()} disponibles</p>
             ) : (
-                <DataTable
-                    data={data}
-                    columns={config.getColumns(refreshData)}
+                <DataTable<CurrentEntity, unknown>
+                    data={data as CurrentEntity[]}
+                    columns={columns as ColumnDef<CurrentEntity>[]}
                     filterColumn={config.filterColumn}
                     filterPlaceholder={config.filterPlaceholder}
                     createButton={

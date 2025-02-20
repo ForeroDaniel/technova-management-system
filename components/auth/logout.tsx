@@ -2,13 +2,23 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/app/api/supabase";
+import { createBrowserClient } from "@supabase/ssr";
 
 export default function Logout() {
     const router = useRouter();
 
     const handleLogout = async () => {
         try {
+            const supabase = createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+                {
+                    auth: {
+                        persistSession: true,
+                    }
+                }
+            );
+
             const { error } = await supabase.auth.signOut();
             if (error) {
                 console.error('Error logging out:', error.message);

@@ -6,10 +6,12 @@
  * - Switching between light/dark theme logos
  * - Preventing flash of wrong theme on load
  * - Accepting custom className for styling
+ * - Using Next.js Image optimization
  */
 
 "use client"
 
+import Image from 'next/image'
 import { useTheme } from "next-themes"
 import { useEffect, useState } from 'react'
 
@@ -38,10 +40,13 @@ export default function ThemeAwareLogo({ className }: ThemeAwareLogoProps) {
     const logoSrc = currentTheme === 'dark' ? '/logo-dark.svg' : '/logo.svg'
 
     return (
-        <img 
+        <Image 
             src={logoSrc} 
             alt="TechNova Logo" 
             className={className}
+            width={150}
+            height={40}
+            priority // Since this is likely the main logo and important for LCP
         />
     )
 } 

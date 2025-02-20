@@ -63,27 +63,29 @@ export function EditDialog<T extends keyof EntityMap>({
 }: EditDialogProps<T>) {
     const { refreshData } = useAppDataSWR()
 
-    /**
-     * Get configuration for the specified entity type
-     * Returns fields, endpoint, and localized entity name
-     */
-    const getEntityConfig = () => {
+    // Move hook calls to the component level
+    const activityFields = useActivityFields()
+    const projectFields = useProjectFields()
+    const employeeFields = useEmployeeFields()
+
+    // Get configuration for the specified entity type
+    const config = (() => {
         switch (entityType) {
             case 'activity':
                 return {
-                    fields: useActivityFields(),
+                    fields: activityFields,
                     endpoint: '/api/activities',
                     name: 'Actividad'
                 }
             case 'project':
                 return {
-                    fields: useProjectFields(),
+                    fields: projectFields,
                     endpoint: '/api/projects',
                     name: 'Proyecto'
                 }
             case 'employee':
                 return {
-                    fields: useEmployeeFields(),
+                    fields: employeeFields,
                     endpoint: '/api/employees',
                     name: 'Empleado'
                 }
@@ -91,9 +93,7 @@ export function EditDialog<T extends keyof EntityMap>({
                 throw new Error(`Unsupported entity type: ${entityType}`)
             }
         }
-    }
-
-    const config = getEntityConfig()
+    })()
 
     return (
         <BaseDialog

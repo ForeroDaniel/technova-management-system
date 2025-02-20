@@ -79,12 +79,6 @@ export function ActionCell<T extends EntityMap[K], K extends keyof EntityMap>({
   // Dialog state management
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [localEntity, setLocalEntity] = useState(entity)
-
-  // Handle entity updates
-  const handleSave = (updatedEntity: T) => {
-    setLocalEntity(updatedEntity)
-  }
 
   // Convert entity name to type for dialog props
   const entityType = entityName.toLowerCase() as 'project' | 'employee' | 'activity'
@@ -117,7 +111,7 @@ export function ActionCell<T extends EntityMap[K], K extends keyof EntityMap>({
       {/* Edit dialog */}
       <EditDialog
         entityType={entityType}
-        entity={localEntity}
+        entity={entity}
         open={editOpen}
         onOpenChange={setEditOpen}
         onUpdate={onUpdate}
@@ -125,7 +119,7 @@ export function ActionCell<T extends EntityMap[K], K extends keyof EntityMap>({
 
       {/* Delete confirmation dialog */}
       <DeleteDialog
-        entity={localEntity}
+        entity={entity}
         entityName={entityNamesInSpanish[entityName]}
         entityEndpoint={entityEndpoints[entityName]}
         open={deleteOpen}
