@@ -16,9 +16,9 @@
 "use client"
 
 import { DataTable } from '@/components/data-table/table'
-import { columns as projectColumns } from './projects-columns'
-import { columns as employeeColumns } from './employees-columns'
-import { columns as activityColumns } from './activities-columns'
+import { columns as projectColumns } from '@/components/data-table/projects-columns'
+import { columns as employeeColumns } from '@/components/data-table/employees-columns'
+import { columns as activityColumns } from '@/components/data-table/activities-columns'
 import { CreateDialog } from '@/components/dialog/create-dialog'
 import { useAppDataSWR } from '@/hooks/useApiData'
 import { EntityTypePlural, EntityTypeSingular, Activity, Project, Employee } from '@/types'
